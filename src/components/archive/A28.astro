@@ -1,0 +1,164 @@
+<script>
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+    import vertex from "../../shaders/a28/vert.glsl?raw";
+    import fragment from "../../shaders/a28/frag.glsl?raw";
+
+    const data = {
+        mouse: { x: 0, y: 0, k: 0.01 },
+        progress: 0,
+        speed: 0.05,
+    };
+    const canvas = document.querySelector(".webgl");
+    const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const camera = new THREE.PerspectiveCamera(
+        70,
+        window.innerWidth / window.innerHeight,
+        0.00001,
+        1000,
+    );
+    camera.position.set(0, 0, 1);
+    // const controls = new OrbitControls(camera, renderer.domElement);
+    // controls.enableDamping = true;
+    // controls.dampingFactor = 0.05;
+
+    const scene = new THREE.Scene();
+
+    const geometry = new THREE.PlaneGeometry(1, 1, 32, 32);
+    // const geometry = new THREE.SphereGeometry(1, 32, 32);
+
+    // const texture = new THREE.TextureLoader().load(image, t => {  })
+
+    const material = new THREE.ShaderMaterial({
+        uniforms: {
+            uAspectRatio: { value: new THREE.Vector2(1, 1) },
+            uResolution: {
+                value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+            },
+            uMouse: { value: new THREE.Vector2(data.mouse.x, data.mouse.y) },
+            uProgress: { value: data.progress },
+            // uTexture: { value: texture },
+            uTime: { value: 0 },
+        },
+        side: THREE.DoubleSide,
+        // wireframe: true,
+        // transparent: true,
+        vertexShader: vertex,
+        fragmentShader: fragment,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    camera.fov = 2 * (180 / Math.PI) * Math.atan(1 / (2 * camera.position.z));
+    camera.updateProjectionMatrix();
+    if (window.innerWidth / window.innerHeight > 1) {
+        mesh.scale.x = mesh.scale.y = window.innerWidth / window.innerHeight;
+    }
+    animate();
+    function animate() {
+        requestAnimationFrame(animate);
+
+        material.uniforms.uTime.value += data.speed;
+        material.uniforms.uProgress.value = data.progress;
+        material.uniforms.uMouse.value.x +=
+            (data.mouse.x - material.uniforms.uMouse.value.x) * data.mouse.k;
+        material.uniforms.uMouse.value.y +=
+            (data.mouse.y - material.uniforms.uMouse.value.y) * data.mouse.k;
+
+        // controls.update();
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener("resize", () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.fov =
+            2 * (180 / Math.PI) * Math.atan(1 / (2 * camera.position.z)); // Move the camera to fit a mesh to the screen
+        // camera.fov = 2 * Math.atan((window.innerHeight / 2) / camera.position.z) * (180 / Math.PI) // Make the dimensions of the canvas the same as the document (1 === 1px)
+
+        camera.updateProjectionMatrix();
+
+        /** Scale the mesh to fit the screen */
+        if (window.innerWidth / window.innerHeight > 1) {
+            mesh.scale.x = mesh.scale.y =
+                window.innerWidth / window.innerHeight;
+        }
+
+        material.uniforms.uResolution.value.x = window.innerWidth;
+        material.uniforms.uResolution.value.y = window.innerHeight;
+
+        /** Calculate aspect ratio */
+        const imageAspectRatio = 1080 / 1920; // texture.image.width / texture.image.height
+        if (window.innerHeight / window.innerWidth > imageAspectRatio) {
+            material.uniforms.uAspectRatio.value.x =
+                (window.innerWidth / window.innerHeight) * imageAspectRatio;
+            material.uniforms.uAspectRatio.value.y = 1;
+        } else {
+            material.uniforms.uAspectRatio.value.x = 1;
+            material.uniforms.uAspectRatio.value.y =
+                window.innerHeight / window.innerWidth / imageAspectRatio;
+        }
+    });
+    window.addEventListener("mousemove", ({ clientX: x, clientY: y }) => {
+        // From -1 to 1
+        data.mouse.x = (x / window.innerWidth) * 2 - 1;
+        data.mouse.y = (y / window.innerHeight) * 2 - 1;
+    });
+</script>
+<canvas class="webgl"></canvas>
+<div class="header">
+    <img src="/profile.webp" alt="" />
+    <div class="backdrop"><h1>Michele Volonghi</h1></div>
+</div>
+<div class="content">
+    <div class="backdrop">
+        <h2>DESCRIPTION</h2>
+        <br />
+         i' m a freelance web developer & web designer. <br /><br /> I build
+        blazingly fast websites with crazy designs that clients can easily
+        manage themselves.
+    </div>
+</div>
+<style lang="scss">
+    .webgl {
+        position: absolute;
+        z-index: -1;
+    }
+    .backdrop {
+        background: rgba(66, 66, 69, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 0.5rem 1.5rem;
+    }
+    .header {
+        padding: 2rem;
+        display: flex;
+        gap: 1rem;
+        img {
+            border-radius: 100%;
+            height: 4rem;
+        }
+        .backdrop {
+            border-radius: 2rem;
+            display: flex;
+            padding: 0 1.5rem;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+        }
+    }
+    .content {
+        padding: 0rem 2rem;
+        display: flex;
+        gap: 1rem;
+        > div {
+            border-radius: 2rem;
+        }
+    }
+</style>

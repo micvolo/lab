@@ -1,0 +1,55 @@
+<script>
+    import P5 from "p5";
+    let sketch = null;
+    let isCreated = false;
+    const createSketch = () => {
+        if (sketch) {
+            if (!document.querySelector(".anim")) {
+                sketch = null;
+            }
+            return;
+        }
+        sketch = new P5(
+            (p5: P5) => {
+                let myShader;
+                p5.preload = () => {
+                    myShader = p5.loadShader(
+                        "/shaders/vert.glsl",
+                        "/shaders/frag.glsl",
+                    );
+                };
+                p5.setup = () => {
+                    p5.createCanvas(
+                        window.innerWidth,
+                        window.innerHeight,
+                        p5.WEBGL,
+                    );
+                };
+
+                p5.draw = () => {
+                    p5.shader(myShader);
+                    myShader.setUniform("u_resolution", [p5.width, p5.height]);
+                    myShader.setUniform("u_time", p5.millis() / 1000);
+                    myShader.setUniform("u_mouse", [p5.mouseX, p5.mouseY]);
+                    p5.quad(-1, -1, 1, -1, 1, 1, -1, 1);
+                };
+            },
+            document.querySelector(".anim") as HTMLElement,
+        );
+    };
+    document.addEventListener("astro:page-load", createSketch);
+</script>
+<div class="anim" transition:persist></div>
+<style is:global>
+    .anim canvas {
+        position: fixed;
+        top: 0;
+        z-index: -1;
+    }
+</style>
+<style>
+    .anim {
+        /* overflow: hidden; */
+        height: 40vh;
+    }
+</style>

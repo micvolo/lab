@@ -1,0 +1,96 @@
+<script>
+    console.log("asd");
+    import P5 from "p5";
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const params = {
+        cols: Math.round(width / 100),
+        rows: Math.round(height / 100),
+        scaleMin: 1,
+        scaleMax: 30,
+        freq: 0.001,
+        amp: 0.2,
+        frame: 0,
+        animate: true,
+        lineCap: "butt",
+    };
+
+    const sketch = (p5: P5) => {
+        const cols = params.cols;
+        const rows = params.rows;
+        const numCells = cols * rows;
+        const gridw = width * 1;
+        const gridh = height * 1;
+        const cellw = gridw / cols;
+        const cellh = gridh / rows;
+        const margx = (width - gridw) * 0.5;
+        const margy = (height - gridh) * 0.5;
+
+        const squares: Square[] = [];
+
+        p5.setup = () => {
+            p5.createCanvas(width, height);
+            for (let i = 0; i < numCells; i++) {
+                const col = i % cols;
+                const row = Math.floor(i / cols);
+                const x = col * cellw;
+                const y = row * cellh;
+                const s = new Square(x, y, 1);
+                s.show();
+                squares.push(s);
+            }
+        };
+
+        p5.draw = () => {
+            for (const s of squares) {
+                s.move();
+                s.show();
+            }
+        };
+        class Square {
+            x: number;
+            y: number;
+            angle: number;
+            constructor(x: number, y: number, angle: number) {
+                this.x = x;
+                this.y = y;
+                this.angle = angle;
+            }
+            move() {
+                p5.push();
+                this.x = this.x + p5.random(-5, 5);
+                this.y = this.y + p5.random(-5, 5);
+                this.angle = p5.random(-5, 5);
+                p5.pop();
+            }
+            show() {
+                // p5.translate(width / 2, height / 2);
+                // p5.translate
+                // p5.rotate(this.angle);
+                p5.push();
+                p5.rect(this.x, this.y, 50, 50);
+                p5.pop();
+            }
+        }
+    };
+
+    new P5(sketch, document.querySelector("#p5") as HTMLElement);
+</script>
+<div id="p5" class="p5"></div>
+<style>
+    #p5 {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+    }
+    h1 {
+        text-align: center;
+        font-size: 12vw;
+        color: white;
+        mix-blend-mode: difference;
+        /* margin: 0; */
+        /* line-height: 40%; */
+    }
+</style>

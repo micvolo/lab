@@ -1,0 +1,48 @@
+---
+const { hideMail = false } = Astro.props;
+---
+
+{
+	!hideMail && (
+		<div class="cool-text">
+			<h1>
+				you can contact me here
+				<a
+					class="mail"
+					href="mailto:michele@stra.studio"
+					target="_blank"
+				>
+					michele@stra.studio
+				</a>
+			</h1>
+		</div>
+	)
+}
+
+<div class="cool-text">
+	<a href="https://github.com/micvolo">Github</a> ~ <a
+		href="https://twitter.com/micvolo">Twitter</a
+	> ~ <a href="https://instagram.com/mic.volo">Insta</a>
+</div>
+
+{!hideMail && <h1 class="my-name">(ah, my name is Michele Volonghi)</h1>}
+
+<style>
+	.cool-text {
+		white-space: pre-line;
+	}
+
+	a {
+		text-decoration: underline;
+	}
+	.mail {
+		text-decoration: underline;
+		text-align: center;
+	}
+
+	.my-name {
+		text-align: end;
+		color: white;
+		padding: 2rem;
+	}
+</style>

@@ -1,0 +1,73 @@
+<script>
+    import P5 from "p5";
+    import opentype from 'opentype.js'
+
+    const container = document.querySelector(".p5") as HTMLElement;
+    const PARAMS = {
+        diameter: 200,
+        string: "STRA",
+    };
+
+    const sketch = (p5: P5) => {
+        let width, height, minsize, myfont, startPressing, pg, fontData, font, path
+
+        p5.preload = () => {
+            myfont = p5.loadFont('/fonts/styro.otf');
+            fontData = p5.loadBytes('/fonts/styro.ttf');
+            console.log('font preloaded!');
+        };
+        p5.setup = () => {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            minsize = Math.min(width, height);
+            p5.createCanvas(width, height);
+            pg = p5.createGraphics(PARAMS.diameter, PARAMS.diameter);
+            container.style.opacity = "1";
+            font = opentype.parse(fontData.bytes.buffer);
+            path = font.getPath(PARAMS.string, 0, 0, 72);
+            console.log(path)
+            const glyphs = font.stringToGlyphs(PARAMS.string);
+            console.log(glyphs)
+        };
+
+        p5.draw = () => {
+            // BACKGROUND
+            // p5.background(0);
+            pg.background(100);
+            // FONT
+            p5.push();
+            p5.textSize(minsize / Math.sqrt(PARAMS.string.length));
+            p5.textAlign(p5.CENTER, p5.CENTER);
+            p5.textFont(myfont);
+            p5.push();
+            p5.fill("white");
+            p5.text(PARAMS.string, width / 2, height / 2);
+            p5.pop();
+            // CIRCLE
+            p5.imageMode(p5.CENTER);
+            p5.noFill();
+            // p5.stroke("red");
+            // p5.circle(p5.mouseX, p5.mouseY, PARAMS.diameter);
+
+            if (p5.mouseIsPressed) {
+
+                if (!startPressing) {
+                    startPressing = {
+                        x: p5.mouseX,
+                        y: p5.mouseY,
+                    }
+                }
+
+                p5.copy(startPressing.x - PARAMS.diameter/2, startPressing.y - PARAMS.diameter/2, PARAMS.diameter, PARAMS.diameter, p5.mouseX - PARAMS.diameter/2, p5.mouseY  - PARAMS.diameter/2, PARAMS.diameter, PARAMS.diameter)
+                // p5.circle(p5.mouseX, p5.mouseY, PARAMS.diameter);
+            } else {
+                startPressing = null;
+            }
+        };
+        p5.windowResized = () => {
+            if (container.clientWidth !== width) p5.setup();
+        };
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>

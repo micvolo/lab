@@ -1,0 +1,130 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+@import url("https://unpkg.com/handsfree@8.5.1/build/lib/assets/handsfree.css");
+
+:root {
+    font-family: Helvetica, Inter, sans-serif;
+    background-color: black;
+    color: white;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-decoration: inherit;
+}
+
+img,
+picture,
+svg,
+video {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    text-decoration: none;
+    display: block;
+}
+
+input {
+    background: inherit;
+}
+
+.p5 {
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+::selection {
+    background: transparent;
+    color: red;
+}
+
+.cool-text {
+    font-size: 8.5vw;
+    letter-spacing: -0.05em;
+    line-height: 80%;
+    white-space: pre-line;
+    background: black;
+    color: white;
+    margin: 2vw;
+    border-radius: 2vw;
+    padding: 2vw;
+
+    >* {
+        display: inline;
+    }
+}
+
+.white-hero {
+    background: white;
+    color: black;
+}
+
+main {
+    background: transparent;
+}
+
+.container::before {
+    content: "";
+    position: absolute;
+    top: -10rem;
+    left: 0;
+    height: 10rem;
+    width: 100%;
+    border-bottom-left-radius: 5rem;
+    border-bottom-right-radius: 5rem;
+    box-shadow: 0 5rem black;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.container {
+    position: relative;
+    background: black;
+    padding: 2vw;
+    margin-bottom: 10rem;
+    transition: opacity .4s;
+}
+
+.container::after {
+    content: "";
+    position: absolute;
+    bottom: -10rem;
+    left: 0;
+    height: 10rem;
+    // background: red;
+    width: 100%;
+    border-top-left-radius: 5rem;
+    border-top-right-radius: 5rem;
+    box-shadow: 0 -5rem black;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.minimalist {
+    color: white;
+    background: black;
+}
+
+
+.handsfree-debugger {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 10rem;
+}

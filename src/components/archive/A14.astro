@@ -1,0 +1,82 @@
+---
+const l1 = 'your hearth'.split("");
+const l2 = "is beating".split("");
+---
+
+<script>
+    import P5 from "p5";
+    import gsap from "gsap";
+    import { Pane } from "tweakpane";
+    const container = document.querySelector(".p5") as HTMLElement;
+    const PARAMS = {
+            size: 0.2,
+        };
+    const sketch = (p5: P5) => {
+        let width, height, size
+        p5.setup = () => {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            size = Math.max(width, height)
+            p5.createCanvas(width, height, p5.WEBGL);
+            // p5.ortho(-width, width, height, -height/2, 0.1, 100);
+            p5.fill("black");
+            p5.stroke("red");
+            // p5.strokeWeight(0);
+            container.style.opacity = "1";
+        };
+
+        p5.draw = () => {
+            p5.rotateX(p5.frameCount * 0.01);
+            p5.rotateY(p5.frameCount * 0.01);
+            p5.box(size * PARAMS.size);
+        };
+        p5.windowResized = () => p5.setup();
+        // pane.on("change", () => p5.setup());
+    };
+    new P5(sketch, container);
+
+    gsap.fromTo(PARAMS, {size: 0}, {size: .5, repeat: -1, yoyo: true, ease:"", duration: 2})
+    // GSAP
+    const t = gsap.timeline({repeat: -1, repeatDelay: 1});
+    t.fromTo('.w1 *', { y: '100%' }, { y: 0, stagger: .1, ease: 'power4.in' })
+    t.to('.w1 *', { opacity: 0, stagger: .05, ease: 'linear' })
+    t.fromTo('.w2 *', { y: '100%' }, { y: 0, stagger: .1, ease: 'power4.in' })
+    t.to('.w2 *', { opacity: 0, stagger: .05, ease: 'linear' })
+</script>
+<div class="p5"></div>
+<div class="words w1">
+    {l1.map((l) => <span>{l}</span>)}
+</div>
+<div class="words w2">
+    {l2.map((l) => <span>{l}</span>)}
+</div>
+<style lang="scss">
+    @font-face {
+        font-family: "Pressio";
+        src: url("/fonts/pressio.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+    }
+    .words {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        font-size: 48vw;
+        text-align: center;
+        white-space: pre;
+        overflow: hidden;
+        line-height: 80%;
+        font-family: "Pressio";
+        color: red;
+        mix-blend-mode: difference;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        span {
+            // display: inline-block;
+            transform: translateY(100%);
+        }
+    }
+</style>

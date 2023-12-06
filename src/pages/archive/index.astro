@@ -1,0 +1,57 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import fs from "node:fs/promises";
+import Animation from "../../components/Animation.astro";
+import Contact from "@components/Contact.astro";
+
+
+const pages = (await fs.readdir("./src/pages/archive")).filter(
+    (p) => !p.includes("index")
+);
+const routes = [];
+for (const route of pages) {
+    routes.push(route.substring(0, route.lastIndexOf(".")));
+}
+routes.sort((a, b) => +a.replace(/^\D+/g, "") - +b.replace(/^\D+/g, ""));
+---
+
+<Layout>
+    <Animation/>
+    <div class="container" id="swup">
+        <a href="/">go back home</a>
+        <div class="cool-text white-hero">
+			<h1>animation archive</h1>
+            <h2>(all the projects are on github)</h2>
+		</div>
+        <div class="cool-text">
+            {routes.map((a) => <a href={`/archive/${a}`}>{a}</a>)}
+        </div>
+    <Contact hideMail/>
+
+    </div>
+</Layout>
+<style lang="scss">
+    .cool-text {
+        display: flex;
+        flex-flow: wrap;
+        &.white-hero {
+            flex-direction: column;
+        }
+    }
+    a {
+        flex: 0 0 25%;
+        text-transform: uppercase;
+        opacity: 0.5;
+        transition: opacity 1s cubic-bezier(0.165, 0.84, 0.44, 1);
+        @media screen and (max-width: 600px) {
+            flex: 0 0 50%;
+        }
+    }
+    a:hover {
+        opacity: 1;
+    }
+    h2 {
+        font-size: 1rem;
+        letter-spacing: 0;
+    }
+</style>

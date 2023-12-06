@@ -1,0 +1,113 @@
+<script src="@scripts/archive/a31.js"></script>
+<canvas class="webgl"></canvas>
+<div class="wrapper">
+    <img src="/profile.webp" alt="" class="logo img-card" />
+    <div class="card title">Michele Volonghi</div>
+    <div>i' m a freelance web developer & web designer.</div>
+    <div>& minimalist.</div>
+    <div class="card text">
+        I BUILD BLAZINGLY FAST WEBSITES WITH CRAZY DESIGNS THAT CLIENTS CAN
+        EASILY MANAGE THEMSELVES.
+    </div>
+    <svg width="64" height="64" viewBox="0 0 1000 1000" fill="currentColor">
+        <path
+            d="M95.9673 222.513C-5.99105 262.558 18.4072 138.333 43.351 71.2148L575.683 48.6068L608.116 360.283L873.286 35.9677L703.808 593.596C763.155 399.614 897.831 122.363 961.75 565.219C1025.67 1008.08 679.64 1003.86 498.635 946.397C356.783 887.996 71.6525 737.607 65.947 603.264C58.8151 435.334 404.023 682.005 510.953 657.32C617.883 632.634 506.522 552.975 439.113 575.982C371.704 598.989 310.698 377.27 353.054 399.971C386.938 418.132 461.468 320.778 494.497 269.831C404.136 237.373 197.926 182.467 95.9673 222.513Z"
+        ></path>
+    </svg>
+    <div class="card w-50">
+        <img src="/images/papa.webp" alt="" class="img-card" />
+    </div>
+</div>
+<style lang="scss">
+    @font-face {
+        font-family: spell;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("/fonts/spell.woff2") format("woff2");
+    }
+    @font-face {
+        font-family: sf;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("/fonts/sf-pro-display_regular.woff2") format("woff2");
+    }
+    @font-face {
+        font-family: sf;
+        font-style: normal;
+        font-weight: 200;
+        font-display: swap;
+        src: url("/fonts/sf-pro-display_light.woff2") format("woff2");
+    }
+    @font-face {
+        font-family: sf;
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url("/fonts/sf-pro-display_bold.woff2") format("woff2");
+    }
+    :global(html) {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+
+        --radius: 1.6rem;
+
+        --bg1: rgb(255, 255, 229);
+        --bg2: rgb(255, 113, 66);
+        --bg3: rgb(61, 66, 148);
+    }
+    .wrapper {
+        --color: #000;
+        --background: rgba(248, 248, 248, 0.7);
+        font: 400 clamp(28px, 2.7777777778vw, 53.3333333333px) / 1 "spell";
+        color: var(--color);
+        &.dark {
+            --color: #fff;
+            --background: rgba(10, 10, 10, 0.7);
+        }
+        padding: 0.2rem;
+        gap: 0.2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        .logo {
+            width: 4rem;
+        }
+        .img-card {
+            border-radius: var(--radius);
+        }
+        svg {
+            color: rgba(248, 248, 248, 0.7);
+        }
+        .card {
+            display: inline-block;
+            font-weight: 500;
+            border-radius: var(--radius);
+            padding: var(--radius);
+            background: var(--background);
+            color: var(--color);
+            backdrop-filter: blur(1rem);
+            &.w-50 {
+                width: 50%;
+            }
+        }
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 0 calc(var(--radius));
+            line-height: clamp(44px, 3.4722222222vw, 66.6666666667px);
+        }
+        .text {
+            font-size: clamp(28px, 2.7777777778vw, 53.3333333333px);
+        }
+    }
+    .webgl {
+        position: fixed;
+        inset: 0;
+        cursor: none;
+        z-index: -1;
+    }
+</style>
