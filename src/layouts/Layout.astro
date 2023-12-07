@@ -1,6 +1,7 @@
 ---
 import { ViewTransitions } from "astro:transitions";
 import "../styles/global.scss";
+import Widget from "@components/Widget.astro";
 ---
 
 <script src="../scripts/main.js"></script>
@@ -12,8 +13,7 @@ import "../styles/global.scss";
 		<ViewTransitions />
 	</head>
 	<body>
-		<main>
-			<slot />
-		</main>
+		<slot />
+		<Widget />
 	</body>
 </html>

@@ -1,18 +1,47 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Works from "../components/Works.astro";
-import Contact from "../components/Contact.astro";
-import Animation from "../components/Animation.astro";
+import Layout from "@layouts/Layout.astro";
+import fs from "node:fs/promises";
+
+const pages = await fs.readdir("./src/pages/archive");
+const routes = pages
+	.map((p) => p.substring(0, p.lastIndexOf(".")))
+	.sort((a, b) => +a.replace(/^\D+/g, "") - +b.replace(/^\D+/g, ""));
 ---
 
 <Layout>
-	<Animation />
-	<div class="container">
-		<div class="cool-text white-hero">
-			<h1>i' m a freelance web developer & web designer.</h1>
-		</div>
-		<div class="cool-text minimalist">& minimalist.</div>
-		<Works />
-		<Contact />
-	</div>
+	<main>
+		{routes.map((a) => <a href={`/archive/${a}`}>{a}</a>)}
+	</main>
 </Layout>
+<style lang="scss">
+	main {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+		gap: 1rem;
+		padding: 1rem;
+		a {
+			color: inherit;
+			text-decoration: inherit;
+			text-transform: uppercase;
+			display: grid;
+			justify-items: center;
+			align-items: center;
+			aspect-ratio: 1;
+			background-color: rgba(21, 21, 21, 0);
+			color: rgba(220, 220, 220, 0);
+			border-radius: 1rem;
+			font-size: clamp(2rem, 10vw, 2rem);
+			transition:
+				color 0.4s,
+				background-color 0.4s;
+			@media (pointer: coarse) {
+				background-color: rgba(21, 21, 21, 0);
+				color: rgba(220, 220, 220, 0.4);
+			}
+			&:hover {
+				background: rgba(21, 21, 21, 1);
+				color: rgba(220, 220, 220, 1);
+			}
+		}
+	}
+</style>
