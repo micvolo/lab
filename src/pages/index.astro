@@ -18,10 +18,13 @@ const routes = pages
 <style lang="scss">
 	main {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+		grid-template-columns: repeat(5, 1fr);
 		gap: 1rem;
 		padding: 1rem;
 		margin-bottom: 20vh;
+		@media (max-width: 64rem) {
+			grid-template-columns: repeat(2, 1fr);
+		}
 		a {
 			color: inherit;
 			text-decoration: inherit;
