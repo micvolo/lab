@@ -21,6 +21,7 @@ const routes = pages
 		grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
 		gap: 1rem;
 		padding: 1rem;
+		margin-bottom: 20vh;
 		a {
 			color: inherit;
 			text-decoration: inherit;
@@ -30,16 +31,12 @@ const routes = pages
 			align-items: center;
 			aspect-ratio: 1;
 			background-color: rgba(21, 21, 21, 0);
-			color: rgba(220, 220, 220, 0);
+			color: rgba(220, 220, 220, 0.6);
 			border-radius: 1rem;
 			font-size: clamp(2rem, 10vw, 2rem);
 			transition:
 				color 0.4s,
 				background-color 0.4s;
-			@media (pointer: coarse) {
-				background-color: rgba(21, 21, 21, 0);
-				color: rgba(220, 220, 220, 0.4);
-			}
 			&:hover {
 				background: rgba(21, 21, 21, 1);
 				color: rgba(220, 220, 220, 1);
