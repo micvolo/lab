@@ -1,0 +1,20 @@
+---
+import Layout from "@layouts/Layout.astro";
+import fs from "node:fs/promises";
+export async function getStaticPaths() {
+    const list = await fs.readdir("./src/pages/archive");
+    const images = {
+        "./archive/a2.astro": () => import("./archive/a2.astro"),
+    };
+    return list.map((p) => {
+        const slug = p.substring(0, p.lastIndexOf("."));
+        return { params: { slug } };
+    });
+}
+const { slug } = Astro.params;
+let module = await import(`./archive/${slug}.astro`);
+---
+
+<Layout>
+    <module.default />
+</Layout>
