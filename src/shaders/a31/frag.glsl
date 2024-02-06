@@ -43,18 +43,17 @@ float map(vec3 p) {
 
     p.z += uTime * -1.; // Forward movement
 
+    float ground = p.y + .75;
+
     vec3 spherePos = vec3(sin(uTime) * 2., 0, 0);
     float sphere = sphere(p - spherePos, 1.);
 
     vec3 q = p;
     q.y -= uTime * .4;
-
     q = fract(q) - .5;
     q.xy *= rot2d(uTime);
 
-    float ground = p.y + .75;
-
-    float box = box(q, vec3(.1));
+    float box = box(q, vec3(.05));
 
     return smin(ground, smin(box, sphere, 1.), 1.);
 }
@@ -62,8 +61,7 @@ float map(vec3 p) {
 void main() {
     vec2 uv = (gl_FragCoord.xy * 2. - uResolution.xy) / uResolution.y;
 
-    float mSpeed = 2.;
-
+    vec2 mSpeed = vec2(2., 1.);
     float reverseMouseY = uResolution.y - uMouse.y;
     vec2 m = (vec2(uMouse.x, reverseMouseY) * 2. - uResolution.xy) / uResolution.y * mSpeed;
 
@@ -73,10 +71,10 @@ void main() {
     vec3 col = vec3(0);               // final pixel color
 
     // Camera rotation
-    // ro.yz *= rot2d(-m.y);
-    // rd.yz *= rot2d(-m.y);
-    // ro.xz *= rot2d(-m.x);
-    // rd.xz *= rot2d(-m.x);
+    ro.yz *= rot2d(-m.y);
+    rd.yz *= rot2d(-m.y);
+    ro.xz *= rot2d(-m.x);
+    rd.xz *= rot2d(-m.x);
 
     float t = 0.; // total distance travelled
 
