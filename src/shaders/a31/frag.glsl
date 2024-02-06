@@ -41,7 +41,7 @@ mat2 rot2d(float a) {
 // Scene definition
 float map(vec3 p) {
 
-    p.z += uTime * -1.; // Forward movement
+    // p.z += uTime * -1.; // Forward movement
 
     float ground = p.y + .75;
 
@@ -49,11 +49,11 @@ float map(vec3 p) {
     float sphere = sphere(p - spherePos, 1.);
 
     vec3 q = p;
-    q.y -= uTime * .4;
+    // q.y -= uTime * .4;
     q = fract(q) - .5;
-    q.xy *= rot2d(uTime);
+    // q.xy *= rot2d(uTime);
 
-    float box = box(q, vec3(.05));
+    float box = box(q, vec3(.1));
 
     return smin(ground, smin(box, sphere, 1.), 1.);
 }
@@ -66,13 +66,13 @@ void main() {
     vec2 m = (vec2(uMouse.x, reverseMouseY) * 2. - uResolution.xy) / uResolution.y * mSpeed;
 
     // Initialization
-    vec3 ro = vec3(0, 0, -3);         // ray origin
+    vec3 ro = vec3(0, 0, -3.);         // ray origin
     vec3 rd = normalize(vec3(uv, 1)); // ray direction
     vec3 col = vec3(0);               // final pixel color
 
     // Camera rotation
-    ro.yz *= rot2d(-m.y);
-    rd.yz *= rot2d(-m.y);
+    ro.yz *= rot2d(-m.y + .75);
+    // rd.yz *= rot2d(-m.y);
     ro.xz *= rot2d(-m.x);
     rd.xz *= rot2d(-m.x);
 
