@@ -43,7 +43,7 @@ float map(vec3 p) {
 
     // p.z += uTime * -1.; // Forward movement
 
-    float ground = p.y + 3.;
+    float ground = p.y + 5.;
 
     vec3 spherePos = vec3(sin(uTime) * 2., 0, 0);
     float sphere = sphere(p - spherePos, 1.);
