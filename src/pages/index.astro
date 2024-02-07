@@ -5,7 +5,8 @@ import fs from "node:fs/promises";
 const pages = await fs.readdir("./src/pages/archive");
 const routes = pages
 	.map((p) => p.substring(0, p.lastIndexOf(".")))
-	.sort((a, b) => +a.replace(/^\D+/g, "") - +b.replace(/^\D+/g, ""));
+	.sort((a, b) => +a.replace(/^\D+/g, "") - +b.replace(/^\D+/g, ""))
+	.reverse();
 // const list = await Astro.glob("../components/archive/a1.astro");
 // console.log(list);
 ---
