@@ -1,16 +1,7 @@
----
-import "@/styles/handsfree.css";
----
-
 <script>
     import P5 from "p5";
     import { Pane } from "tweakpane";
 
-    let pinch = document.querySelectorAll<HTMLElement>(".handsfree-pointer");
-    let oldLeft, oldRight;
-    window.onload = () => {
-        pinch = document.querySelectorAll<HTMLElement>(".handsfree-pointer");
-    };
     const container = document.querySelector(".p5") as HTMLElement;
     const sketch = (p5: P5) => {
         const PARAMS = {
@@ -169,35 +160,6 @@ import "@/styles/handsfree.css";
         };
         p5.windowResized = () => p5.setup();
         pane.on("change", () => p5.setup());
-        document.addEventListener("handsfree-data", () => {
-            if (!pinch?.length) return;
-            const left =
-                100 -
-                Math.round(
-                    (pinch[0]?.getBoundingClientRect().top * 100) /
-                        window.innerHeight,
-                );
-            const right =
-                100 -
-                Math.round(
-                    (pinch[1]?.getBoundingClientRect().top * 100) /
-                        window.innerHeight,
-                );
-            // PARAMS.squareSize = left;
-            // PARAMS.margin = right;
-            if (left != 100 && oldLeft !== left) {
-                console.log("left handed moved!", left);
-                PARAMS.squareSize = left;
-                p5.setup();
-            }
-            if (right != 100 && oldRight !== right) {
-                console.log("right handed moved!", right);
-                PARAMS.margin = right;
-                p5.setup();
-            }
-            oldLeft = left;
-            oldRight = right;
-        });
     };
     new P5(sketch, container);
 </script>
