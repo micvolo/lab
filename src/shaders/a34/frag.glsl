@@ -27,7 +27,7 @@ void main() {
 
     // pixelate
     float m = distance(mouse, (vec2(.5, .5))) * uVideoResolution.x;
-    uv = floor(uv * m) / m;
+    uv = floor((uv - .5) * m) / m + .5;
 
     vec3 tex = texture2D(uVideo, uv).rgb;
     gl_FragColor = vec4(tex, 1.);
