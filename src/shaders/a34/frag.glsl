@@ -9,6 +9,7 @@ uniform sampler2D uVideo;
 varying vec2 vUv;
 
 void main() {
+    // center video
     vec2 uv = vUv;
     float videoAspect = uVideoResolution.x / uVideoResolution.y;
     float screenAspect = uResolution.x / uResolution.y;
@@ -20,9 +21,14 @@ void main() {
     }
     uv = (uv - .5) * scale + .5;
 
+    // 
+    vec2 mouse = uMouse.xy / uResolution;
+    mouse.y = 1. - mouse.y;
+
     // pixelate
-    float m = (uMouse.x / uResolution.x) * uResolution.x / 4.;
+    float m = distance(mouse, (vec2(.5, .5))) * uVideoResolution.x;
     uv = floor(uv * m) / m;
+
     vec3 tex = texture2D(uVideo, uv).rgb;
     gl_FragColor = vec4(tex, 1.);
 }
