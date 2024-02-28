@@ -42,7 +42,8 @@
 
     // video
     const video = document.querySelector("video") as HTMLVideoElement;
-    await new Promise((r) => (video.onloadeddata = r));
+    if (video.readyState < 1)
+        await new Promise((r) => (video.onloadeddata = r));
     const videoTexture = new Texture(gl, {
         generateMipmaps: false,
         width: video.videoWidth,

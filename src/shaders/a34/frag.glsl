@@ -21,7 +21,7 @@ void main() {
     }
     uv = (uv - .5) * scale + .5;
 
-    // 
+    // mouse
     vec2 mouse = uMouse.xy / uResolution;
     mouse.y = 1. - mouse.y;
 
