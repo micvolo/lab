@@ -1,5 +1,5 @@
 <script>
-    import fragment from "@/shaders/a34/frag.glsl?raw";
+    import fragment from "@/shaders/a35/frag.glsl?raw";
     import {
         Renderer,
         Geometry,
@@ -40,13 +40,27 @@
     }
     window.addEventListener("resize", resize, false);
 
+    // displacement
+    const img = document.querySelector(".d") as HTMLImageElement;
+    const displacement = new Texture(gl, {
+        image: img,
+        generateMipmaps: false,
+        width: img.width,
+        height: img.height,
+    });
+
     // video
     const video = document.querySelector(".video1") as HTMLVideoElement;
+    const video2 = document.querySelector(".video2") as HTMLVideoElement;
     video.play();
+    video2.play();
 
     await new Promise((r) => {
         if (video.readyState >= video.HAVE_CURRENT_DATA) return r(true);
         video.addEventListener("loadeddata", () => r(true));
+
+        if (video2.readyState >= video2.HAVE_CURRENT_DATA) return r(true);
+        video2.addEventListener("loadeddata", () => r(true));
     });
 
     const videoTexture = new Texture(gl, {
@@ -54,6 +68,13 @@
         generateMipmaps: false,
         width: video.videoWidth,
         height: video.videoHeight,
+    });
+
+    const videoTexture2 = new Texture(gl, {
+        image: video2,
+        generateMipmaps: false,
+        width: video2.videoWidth,
+        height: video2.videoHeight,
     });
 
     // Triangle that covers viewport, with UVs that still span 0 > 1 across viewport
@@ -83,15 +104,19 @@
             uTime: { value: 0 },
             uMouse: { value: uMouse },
             uVideo: { value: videoTexture },
+            uVideo2: { value: videoTexture2 },
             uVideoResolution: {
                 value: new Vec2(video.videoWidth, video.videoHeight),
             },
+            uVideo2Resolution: {
+                value: new Vec2(video2.videoWidth, video2.videoHeight),
+            },
+            uDisplacement: { value: displacement },
             uResolution: {
                 value: new Vec2(window.innerWidth, window.innerHeight),
             },
         },
     });
-
     const mesh = new Mesh(gl, { geometry, program });
 
     requestAnimationFrame(update);
@@ -100,6 +125,7 @@
 
         // video frames
         videoTexture.needsUpdate = true;
+        videoTexture2.needsUpdate = true;
 
         // time
         program.uniforms.uTime.value = t * 0.001;
@@ -108,8 +134,11 @@
         renderer.render({ scene: mesh });
     }
 </script>
+<script src="@/scripts/recorder.ts"></script>
 <canvas class="webgl"></canvas>
 <video loop muted playsinline src="/projects/a34/vv.mp4" class="video1"></video>
+<video loop muted playsinline src="/projects/a34/v.mp4" class="video2"></video>
+<img src="/projects/a35/d.webp" class="d" />
 <style lang="scss">
     :global(html, body) {
         position: fixed;

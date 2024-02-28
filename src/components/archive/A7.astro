@@ -1,7 +1,3 @@
----
-import Recorder from "./Recorder.astro";
----
-
 <script>
     import P5 from "p5";
 
@@ -44,7 +40,7 @@ import Recorder from "./Recorder.astro";
                     p5.translate(x, y);
                     p5.translate(
                         (w * params.gridw) / 2,
-                        (h * params.gridh) / 2
+                        (h * params.gridh) / 2,
                     );
                     p5.rotate(p5.PI * n);
                     p5.rectMode(p5.CENTER);
@@ -63,4 +59,3 @@ import Recorder from "./Recorder.astro";
     new P5(sketch, document.querySelector("#p5") as HTMLElement);
 </script>
 <div id="p5" class="p5"></div>
-<Recorder />
