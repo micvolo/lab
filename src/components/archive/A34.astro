@@ -42,14 +42,18 @@
 
     // video
     const video = document.querySelector("video") as HTMLVideoElement;
-    if (video.readyState < 1)
-        await new Promise((r) => (video.onloadeddata = r));
+    video.play();
+
+    await new Promise((r) => {
+        if (video.readyState >= video.HAVE_ENOUGH_DATA) return r(true);
+        video.onloadeddata = () => r(true);
+    });
+    console.log(video.videoWidth, video.videoHeight);
     const videoTexture = new Texture(gl, {
         generateMipmaps: false,
         width: video.videoWidth,
         height: video.videoHeight,
     });
-    video.play();
 
     // Triangle that covers viewport, with UVs that still span 0 > 1 across viewport
     const geometry = new Geometry(gl, {
