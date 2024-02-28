@@ -45,11 +45,12 @@
     video.play();
 
     await new Promise((r) => {
-        if (video.readyState >= video.HAVE_ENOUGH_DATA) return r(true);
-        video.onloadeddata = () => r(true);
+        if (video.readyState >= video.HAVE_CURRENT_DATA) return r(true);
+        video.addEventListener("loadeddata", () => r(true));
     });
-    console.log(video.videoWidth, video.videoHeight);
+
     const videoTexture = new Texture(gl, {
+        image: video,
         generateMipmaps: false,
         width: video.videoWidth,
         height: video.videoHeight,
@@ -98,10 +99,7 @@
         requestAnimationFrame(update);
 
         // video frames
-        if (video.readyState >= video.HAVE_ENOUGH_DATA) {
-            if (!videoTexture.image) videoTexture.image = video;
-            videoTexture.needsUpdate = true;
-        }
+        videoTexture.needsUpdate = true;
 
         // time
         program.uniforms.uTime.value = t * 0.001;
