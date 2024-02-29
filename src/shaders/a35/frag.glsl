@@ -41,7 +41,7 @@ void main() {
     float d1 = (tex.r + tex.g + tex.b) / 3.;
     float d2 = (tex2.r + tex2.g + tex2.b) / 3.;
 
-    float val = d * dCenter;
+    float val = d2 * dCenter;
     vec2 displacedUv = uv + val;
 
     vec3 t1 = texture2D(uVideo, displacedUv).rgb;

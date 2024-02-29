@@ -1,25 +1,26 @@
 let canvas = document.querySelector("canvas");
-let stream = canvas.captureStream();
+let stream = canvas.captureStream(30);
 let recorder = new MediaRecorder(stream);
-recorder.start();
-
 let chunks = [];
-
 recorder.ondataavailable = (e) => chunks.push(e.data);
-
 recorder.onstop = () => {
-    console.log(recorder)
-    let blob = new Blob(chunks, { type: "video/webm" });
-    let url = URL.createObjectURL(blob);
-    window.open(url);
+  let blob = new Blob(chunks, { type: "video/webm" });
+  let a = document.createElement("a")
+  a.setAttribute("href", URL.createObjectURL(blob))
+  a.setAttribute("download", "r.webm")
+  a.click();
+  a.remove();
 }
 
+let defaultTitle = document.title;
 addEventListener("keydown", (e) => {
-    if (e.code === "KeyR") {
-        if (recorder.state === "recording") {
-            recorder.stop();
-        } else {
-            recorder.start();
-        }
+  if (e.code === "KeyS") {
+    if (recorder.state === "recording") {
+      recorder.stop();
+      document.title = defaultTitle;
+    } else {
+      recorder.start();
+      document.title = 'Recording | ' + defaultTitle;
     }
+  }
 });

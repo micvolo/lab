@@ -24,12 +24,11 @@
 
     const renderer = new Renderer({
         canvas: document.querySelector(".webgl") as HTMLCanvasElement,
-        dpr: 1,
+        dpr: window.devicePixelRatio,
         width: window.innerWidth,
         height: window.innerHeight,
     });
     const gl = renderer.gl;
-    document.body.appendChild(gl.canvas);
 
     function resize() {
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -38,7 +37,7 @@
             window.innerHeight,
         );
     }
-    window.addEventListener("resize", resize, false);
+    window.addEventListener("resize", resize);
 
     // displacement
     const img = document.querySelector(".d") as HTMLImageElement;
@@ -77,7 +76,6 @@
         height: video2.videoHeight,
     });
 
-    // Triangle that covers viewport, with UVs that still span 0 > 1 across viewport
     const geometry = new Geometry(gl, {
         position: {
             size: 2,
@@ -85,7 +83,6 @@
         },
         uv: { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) },
     });
-    // Alternatively, you could use the Triangle class.
 
     const program = new Program(gl, {
         vertex: /* glsl */ `
@@ -118,7 +115,8 @@
         },
     });
     const mesh = new Mesh(gl, { geometry, program });
-
+    console.log(mesh);
+    let tex;
     requestAnimationFrame(update);
     function update(t) {
         requestAnimationFrame(update);
@@ -132,6 +130,8 @@
 
         // Don't need a camera if camera uniforms aren't required
         renderer.render({ scene: mesh });
+        renderer.render({ scene: mesh, target: tex });
+        // console.log(tex);
     }
 </script>
 <script src="@/scripts/recorder.ts"></script>
