@@ -1,5 +1,6 @@
 <script>
     import fragment from "@/shaders/a35/frag.glsl?raw";
+    import frag2 from "@/shaders/a34/frag.glsl?raw";
     import {
         Renderer,
         Geometry,
@@ -8,6 +9,7 @@
         Vec2,
         Vec4,
         Texture,
+        RenderTarget,
     } from "ogl";
 
     // mouse
@@ -38,6 +40,19 @@
         );
     }
     window.addEventListener("resize", resize);
+
+    function createDoubleFBO(gl, options = {}) {
+        const fbo = {
+            read: new RenderTarget(gl, options),
+            write: new RenderTarget(gl, options),
+            swap: () => {
+                let temp = fbo.read;
+                fbo.read = fbo.write;
+                fbo.write = temp;
+            },
+        };
+        return fbo;
+    }
 
     // displacement
     const img = document.querySelector(".d") as HTMLImageElement;
@@ -114,24 +129,46 @@
             },
         },
     });
-    const mesh = new Mesh(gl, { geometry, program });
-    console.log(mesh);
-    let tex;
-    requestAnimationFrame(update);
-    function update(t) {
-        requestAnimationFrame(update);
+    const program2 = new Program(gl, {
+        vertex: /* glsl */ `
+            attribute vec2 uv;
+            attribute vec2 position;
 
-        // video frames
+            varying vec2 vUv;
+
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 0, 1);
+            }
+        `,
+        fragment: frag2,
+        uniforms: {
+            uTime: { value: 0 },
+            uMouse: { value: uMouse },
+            uVideo: { value: videoTexture },
+            uVideoResolution: {
+                value: new Vec2(video.videoWidth, video.videoHeight),
+            },
+            uResolution: {
+                value: new Vec2(window.innerWidth, window.innerHeight),
+            },
+        },
+    });
+    const mesh = new Mesh(gl, { geometry, program });
+
+    const density = createDoubleFBO(gl);
+    const mesh2 = new Mesh(gl, { geometry, program: program2 });
+
+    requestAnimationFrame(update);
+    function update(t: number) {
+        requestAnimationFrame(update);
         videoTexture.needsUpdate = true;
         videoTexture2.needsUpdate = true;
-
-        // time
         program.uniforms.uTime.value = t * 0.001;
-
-        // Don't need a camera if camera uniforms aren't required
+        renderer.render({ scene: mesh2, target: density.write });
+        density.swap();
+        program.uniforms.uVideo.value = density.read.texture;
         renderer.render({ scene: mesh });
-        renderer.render({ scene: mesh, target: tex });
-        // console.log(tex);
     }
 </script>
 <script src="@/scripts/recorder.ts"></script>
