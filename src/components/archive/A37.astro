@@ -1,0 +1,204 @@
+<script>
+    import P5 from "p5";
+    const container = document.querySelector(".p5") as HTMLElement;
+    const sketch = (p5: P5) => {
+        const o = {
+            sizex: 100,
+            sizey: 100,
+            speed: 0.03,
+        } as any;
+
+        p5.setup = () => {
+            o.width = container.clientWidth;
+            o.height = container.clientHeight;
+            o.numberx = Math.ceil(o.width / o.sizex);
+            o.numbery = Math.ceil(o.height / o.sizey);
+
+            p5.createCanvas(o.width, o.height);
+            p5.background("black");
+        };
+
+        p5.draw = () => {
+            p5.background("black");
+            for (let ix = 0; ix < o.numberx; ix++) {
+                for (let iy = 0; iy < o.numbery; iy++) {
+                    let x = ix * o.sizex;
+                    let y = iy * o.sizey;
+                    let sizey =
+                        o.sizex *
+                        Math.abs(
+                            p5.sin(p5.frameCount * 0.01 + ix / 10 + (iy % 2)),
+                        );
+
+                    let sizey2 =
+                        o.sizex *
+                        Math.abs(
+                            p5.sin(p5.frameCount * 0.01 + iy / 100 + (iy % 3)),
+                        );
+                    p5.push();
+                    p5.translate(x, y + sizey);
+                    drawS(o.sizex, o.sizey - sizey);
+                    p5.pop();
+
+                    p5.push();
+                    p5.translate(x, y);
+                    drawA(o.sizex, sizey);
+                    p5.pop();
+                }
+            }
+        };
+
+        function drawS(w, h) {
+            p5.scale(w / 81, h / 97);
+            p5.fill("rgba(0, 0, 0, 0)");
+            p5.stroke("rgba(0,0,0,0)");
+            p5.strokeCap(p5.PROJECT);
+            p5.strokeJoin(p5.MITER);
+            p5.beginShape();
+            p5.vertex(0, 0);
+            p5.vertex(81, 0);
+            p5.quadraticVertex(81, 0, 81, 0);
+            p5.vertex(81, 97);
+            p5.quadraticVertex(81, 97, 81, 97);
+            p5.vertex(0, 97);
+            p5.quadraticVertex(0, 97, 0, 97);
+            p5.vertex(0, 0);
+            p5.quadraticVertex(0, 0, 0, 0);
+            p5.endShape();
+            p5.fill("#e38483");
+            p5.beginShape();
+            p5.vertex(40.07, 97.3);
+            p5.bezierVertex(13.81, 97.3, -0.75, 84.82, -0.75, 65.97);
+            p5.vertex(26.03, 65.97);
+            p5.bezierVertex(26.03, 72.73, 30.32, 77.28, 41.24, 77.28);
+            p5.bezierVertex(48.78, 77.28, 53.59, 74.68, 53.59, 69.74);
+            p5.bezierVertex(53.59, 62.72, 50.08, 61.81, 34.35, 59.47);
+            p5.bezierVertex(12.38, 56.22, 1.2, 47.38, 1.2, 30.74);
+            p5.bezierVertex(1.2, 11.5, 16.15, 0.0599954, 40.33, 0.0599954);
+            p5.bezierVertex(63.08, 0.0599954, 78.29, 11.5, 78.29, 28.66);
+            p5.vertex(51.77, 28.66);
+            p5.bezierVertex(51.38, 21.64, 45.4, 19.69, 39.68, 19.69);
+            p5.bezierVertex(32.92, 19.69, 28.5, 22.55, 28.5, 27.23);
+            p5.bezierVertex(28.5, 34.12, 34.22, 34.51, 48.78, 36.72);
+            p5.bezierVertex(63.86, 38.93, 81.02, 43.09, 81.02, 67.01);
+            p5.bezierVertex(81.02, 84.82, 67.5, 97.3, 40.07, 97.3);
+            p5.endShape();
+        }
+        function drawT(w, h) {
+            p5.scale(w / 79, h / 94);
+            p5.fill("rgba(0, 0, 0, 0)");
+            p5.stroke("rgba(0,0,0,0)");
+            p5.strokeCap(p5.PROJECT);
+            p5.strokeJoin(p5.MITER);
+            p5.beginShape();
+            p5.vertex(0, 0);
+            p5.vertex(79, 0);
+            p5.quadraticVertex(79, 0, 79, 0);
+            p5.vertex(79, 94);
+            p5.quadraticVertex(79, 94, 79, 94);
+            p5.vertex(0, 94);
+            p5.quadraticVertex(0, 94, 0, 94);
+            p5.vertex(0, 0);
+            p5.quadraticVertex(0, 0, 0, 0);
+            p5.endShape();
+            p5.fill("#81b3cb");
+            p5.beginShape();
+            p5.vertex(26.17, 94);
+            p5.vertex(26.17, 21.85);
+            p5.vertex(0.04, 21.85);
+            p5.vertex(0.04, -0.770004);
+            p5.vertex(79.47, -0.770004);
+            p5.vertex(79.47, 21.85);
+            p5.vertex(52.56, 21.85);
+            p5.vertex(52.56, 94);
+            p5.vertex(26.17, 94);
+            p5.endShape();
+        }
+
+        function drawR(w, h) {
+            p5.scale(w / 83, h / 94);
+            p5.fill("rgba(0, 0, 0, 0)");
+            p5.stroke("rgba(0,0,0,0)");
+            p5.strokeCap(p5.PROJECT);
+            p5.strokeJoin(p5.MITER);
+            p5.beginShape();
+            p5.vertex(0, 0);
+            p5.vertex(83, 0);
+            p5.quadraticVertex(83, 0, 83, 0);
+            p5.vertex(83, 94);
+            p5.quadraticVertex(83, 94, 83, 94);
+            p5.vertex(0, 94);
+            p5.quadraticVertex(0, 94, 0, 94);
+            p5.vertex(0, 0);
+            p5.quadraticVertex(0, 0, 0, 0);
+            p5.endShape();
+            p5.fill("#c77fae");
+            p5.beginShape();
+            p5.vertex(-1.03, 94);
+            p5.vertex(-1.03, -0.770004);
+            p5.vertex(48.37, -0.770004);
+            p5.bezierVertex(72.03, -0.770004, 83.21, 9.24, 83.21, 27.44);
+            p5.bezierVertex(83.21, 38.62, 76.71, 47.59, 66.96, 49.8);
+            p5.vertex(66.96, 50.71);
+            p5.bezierVertex(75.93, 52.66, 80.74, 58.25, 80.74, 68.78);
+            p5.vertex(80.74, 82.56);
+            p5.bezierVertex(80.74, 86.2, 80.74, 90.23, 82.43, 94);
+            p5.vertex(55.91, 94);
+            p5.bezierVertex(54.87, 91.92, 54.35, 87.63, 54.35, 82.69);
+            p5.vertex(54.35, 73.33);
+            p5.bezierVertex(54.35, 66.7, 51.75, 62.67, 42.26, 62.67);
+            p5.vertex(25.36, 62.67);
+            p5.vertex(25.36, 94);
+            p5.vertex(-1.03, 94);
+            p5.endShape();
+            p5.vertex(25.36, 42);
+            p5.vertex(44.47, 42);
+            p5.bezierVertex(52.92, 42, 56.17, 37.32, 56.17, 31.08);
+            p5.bezierVertex(56.17, 23.41, 51.36, 20.81, 44.47, 20.81);
+            p5.vertex(25.36, 20.81);
+            p5.vertex(25.36, 42);
+            p5.endShape();
+        }
+        function drawA(w, h) {
+            p5.scale(w / 97, h / 94);
+            p5.fill("rgba(0, 0, 0, 0)");
+            p5.stroke("rgba(0,0,0,0)");
+            p5.strokeCap(p5.PROJECT);
+            p5.strokeJoin(p5.MITER);
+            p5.beginShape();
+            p5.vertex(0, 0);
+            p5.vertex(97, 0);
+            p5.quadraticVertex(97, 0, 97, 0);
+            p5.vertex(97, 94);
+            p5.quadraticVertex(97, 94, 97, 94);
+            p5.vertex(0, 94);
+            p5.quadraticVertex(0, 94, 0, 94);
+            p5.vertex(0, 0);
+            p5.quadraticVertex(0, 0, 0, 0);
+            p5.endShape();
+            p5.fill("#4e7a64");
+            p5.beginShape();
+            p5.vertex(-0.26, 94);
+            p5.vertex(29.25, -0.770004);
+            p5.vertex(66.82, -0.770004);
+            p5.vertex(96.33, 94);
+            p5.vertex(68.9, 94);
+            p5.vertex(63.96, 77.1);
+            p5.vertex(32.11, 77.1);
+            p5.vertex(27.17, 94);
+            p5.vertex(-0.26, 94);
+            p5.endShape();
+            p5.vertex(37.96, 57.08);
+            p5.vertex(58.11, 57.08);
+            p5.vertex(52.52, 37.97);
+            p5.vertex(48.49, 22.89);
+            p5.vertex(47.58, 22.89);
+            p5.vertex(43.55, 37.97);
+            p5.vertex(37.96, 57.08);
+            p5.endShape();
+        }
+        p5.windowResized = () => p5.setup();
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>

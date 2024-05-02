@@ -1,6 +1,6 @@
 <script>
-    import fragment from "@/shaders/a35/frag.glsl?raw";
-    import frag2 from "@/shaders/a34/frag.glsl?raw";
+    import fragment from "@/shaders/a36/frag.glsl?raw";
+    import fragment2 from "@/shaders/a36/frag1.glsl?raw";
     import {
         Renderer,
         Geometry,
@@ -53,10 +53,10 @@
         };
         return fbo;
     }
+    const channel1 = createDoubleFBO(gl);
 
-    // displacement
     const img = document.querySelector(".d") as HTMLImageElement;
-    const displacement = new Texture(gl, {
+    const imgTexture = new Texture(gl, {
         image: img,
         generateMipmaps: false,
         width: img.width,
@@ -65,32 +65,17 @@
 
     // video
     const video = document.querySelector(".video1") as HTMLVideoElement;
-    const video2 = document.querySelector(".video2") as HTMLVideoElement;
     video.play();
-    video2.play();
-
     await new Promise((r) => {
         if (video.readyState >= video.HAVE_CURRENT_DATA) return r(true);
         video.addEventListener("loadeddata", () => r(true));
-
-        if (video2.readyState >= video2.HAVE_CURRENT_DATA) return r(true);
-        video2.addEventListener("loadeddata", () => r(true));
     });
-
     const videoTexture = new Texture(gl, {
         image: video,
         generateMipmaps: false,
         width: video.videoWidth,
         height: video.videoHeight,
     });
-
-    const videoTexture2 = new Texture(gl, {
-        image: video2,
-        generateMipmaps: false,
-        width: video2.videoWidth,
-        height: video2.videoHeight,
-    });
-
     const geometry = new Geometry(gl, {
         position: {
             size: 2,
@@ -115,15 +100,10 @@
         uniforms: {
             uTime: { value: 0 },
             uMouse: { value: uMouse },
-            uVideo: { value: videoTexture },
-            uVideo2: { value: videoTexture2 },
+            uVideo: { value: null },
             uVideoResolution: {
                 value: new Vec2(video.videoWidth, video.videoHeight),
             },
-            uVideo2Resolution: {
-                value: new Vec2(video2.videoWidth, video2.videoHeight),
-            },
-            uDisplacement: { value: displacement },
             uResolution: {
                 value: new Vec2(window.innerWidth, window.innerHeight),
             },
@@ -141,11 +121,13 @@
                 gl_Position = vec4(position, 0, 1);
             }
         `,
-        fragment: frag2,
+        fragment: fragment2,
         uniforms: {
             uTime: { value: 0 },
             uMouse: { value: uMouse },
+            uImage: { value: imgTexture },
             uVideo: { value: videoTexture },
+            uVideo1: { value: channel1.read.texture },
             uVideoResolution: {
                 value: new Vec2(video.videoWidth, video.videoHeight),
             },
@@ -156,38 +138,34 @@
     });
     const mesh = new Mesh(gl, { geometry, program });
 
-    const density = createDoubleFBO(gl);
-    const mesh2 = new Mesh(gl, { geometry, program: program2 });
+    const mesh1 = new Mesh(gl, { geometry, program: program2 });
 
     requestAnimationFrame(update);
     function update(t: number) {
         requestAnimationFrame(update);
         videoTexture.needsUpdate = true;
-        videoTexture2.needsUpdate = true;
         program.uniforms.uTime.value = t * 0.001;
-        renderer.render({ scene: mesh2, target: density.write });
-        density.swap();
-        program.uniforms.uVideo.value = density.read.texture;
+        renderer.render({ scene: mesh1, target: channel1.write });
+        channel1.swap();
+        program.uniforms.uVideo.value = channel1.read.texture;
         renderer.render({ scene: mesh });
     }
 </script>
 <script src="@/scripts/recorder.ts"></script>
 <canvas class="webgl"></canvas>
 <video loop muted playsinline src="/projects/a34/vv.mp4" class="video1"></video>
-<video loop muted playsinline src="/projects/a34/v.mp4" class="video2"></video>
-<img src="/projects/a35/dlow.webp" class="d" />
+<img src="/images/rand.png" class="d" />
 <style lang="scss">
     :global(html, body) {
         position: fixed;
         inset: 0;
     }
-
     .webgl {
         position: fixed;
         inset: 0;
     }
-
-    video {
+    video,
+    img {
         display: none;
     }
 </style>
