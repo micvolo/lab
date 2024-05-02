@@ -1,0 +1,360 @@
+<script>
+    import P5 from "p5";
+    const container = document.querySelector(".p5") as HTMLElement;
+    const sketch = (p5: P5) => {
+        const o = {
+            size: 5,
+        } as any;
+
+        p5.preload = () => {
+            o.img = p5.loadImage("/projects/a38/2.png");
+        };
+
+        p5.setup = () => {
+            o.data = [];
+            o.width = container.clientWidth;
+            o.height = container.clientHeight;
+
+            p5.createCanvas(o.width, o.height);
+            p5.noStroke();
+
+            o.img.loadPixels();
+            o.img.resize(o.width, 0);
+            o.img.updatePixels();
+            // p5.image(o.img, 0, 0);
+
+            for (let starty = 0; starty < o.img.height; starty++) {
+                for (let startx = 0; startx < o.img.width; startx++) {
+                    let index = (startx + starty * o.img.width) * 4;
+
+                    let r = o.img.pixels[index];
+                    let g = o.img.pixels[index + 1];
+                    let b = o.img.pixels[index + 2];
+
+                    let bright = r * 0.299 + g * 0.587 + b * 0.114;
+
+                    let t = Math.floor(bright / (255 / 3));
+
+                    o.data.push(t);
+                    startx = startx + o.size - 1;
+                }
+                starty = starty + o.size - 1;
+            }
+
+            let actual = o.data[0];
+            let count = 0;
+            for (let i = 0; i < o.data.length; i++) {
+                let x = i % Math.ceil(o.img.width / o.size);
+                let y = Math.floor(i / Math.ceil(o.img.width / o.size));
+                let t = o.data[i];
+
+                if (actual === t && x !== Math.ceil(o.img.width / o.size) - 1) {
+                    count++;
+                    continue;
+                }
+
+                p5.push();
+                p5.translate((x - count) * o.size, y * o.size);
+                // p5.rect(0, 0, o.size * (count + 1), o.size);
+                switch (actual) {
+                    case 0:
+                        p5.fill("#F47A21");
+                        drawBig(o.size * (count + 1), o.size);
+                        break;
+                    case 1:
+                        p5.fill("#2263BC");
+                        drawTree(o.size * (count + 1), o.size);
+                        break;
+                    case 2:
+                        p5.fill("#F0BCEC");
+                        drawStudio(o.size * (count + 1), o.size);
+                        break;
+                }
+                p5.pop();
+
+                actual = t;
+                count = 0;
+            }
+        };
+
+        function drawBig(w, h) {
+            p5.scale(w / 265.81, h / 91.31);
+            p5.strokeCap(p5.PROJECT);
+            p5.strokeJoin(p5.MITER);
+            p5.beginShape();
+            p5.vertex(197.062, 91.3125);
+            p5.bezierVertex(168.562, 91.3125, 154.75, 76.375, 154.75, 45.4375);
+            p5.vertex(154.75, 45.1875);
+            p5.bezierVertex(154.75, 14.6875, 173, 0, 210.75, 0);
+            p5.bezierVertex(244.438, 0, 262, 10.0625, 264.688, 30.8125);
+            p5.vertex(224.75, 35.5);
+            p5.bezierVertex(223, 27.5625, 218.438, 23.75, 210.75, 23.75);
+            p5.bezierVertex(199.938, 23.75, 194.75, 30.4375, 194.75, 44.3125);
+            p5.vertex(194.75, 45.875);
+            p5.bezierVertex(194.75, 60.0625, 199.938, 66.875, 210.75, 66.875);
+            p5.bezierVertex(218.625, 66.875, 223.25, 63.3125, 224.875, 55.9375);
+            p5.vertex(207.438, 55.9375);
+            p5.vertex(207.438, 38.4375);
+            p5.vertex(265.812, 38.4375);
+            p5.vertex(265.812, 89.375);
+            p5.vertex(234.188, 89.375);
+            p5.bezierVertex(233.625, 84.9375, 234.875, 78.6875, 238.062, 70.25);
+            p5.vertex(236.375, 69.5625);
+            p5.bezierVertex(229.062, 84.25, 216.25, 91.3125, 197.062, 91.3125);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(146.625, 89.375);
+            p5.vertex(107.875, 89.375);
+            p5.vertex(107.875, 1.875);
+            p5.vertex(146.625, 1.875);
+            p5.vertex(146.625, 89.375);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(72.0625, 89.375);
+            p5.vertex(0, 89.375);
+            p5.vertex(0, 1.875);
+            p5.vertex(70.125, 1.875);
+            p5.bezierVertex(89.4375, 1.875, 98.75, 9.0625, 98.75, 23.9375);
+            p5.vertex(98.75, 24.25);
+            p5.bezierVertex(98.75, 34.8125, 94.0625, 41.0625, 84.3125, 43.375);
+            p5.vertex(84.3125, 44.625);
+            p5.bezierVertex(95.75, 47.25, 101.312, 53.9375, 101.312, 65);
+            p5.vertex(101.312, 65.25);
+            p5.bezierVertex(101.312, 81.5, 91.8125, 89.375, 72.0625, 89.375);
+            p5.endShape();
+            p5.vertex(38.75, 23.4375);
+            p5.vertex(38.75, 34.5625);
+            p5.vertex(53.1875, 34.5625);
+            p5.bezierVertex(57.9375, 34.5625, 60.25, 32.8125, 60.25, 29.125);
+            p5.vertex(60.25, 28.875);
+            p5.bezierVertex(60.25, 25.1875, 57.9375, 23.4375, 53.1875, 23.4375);
+            p5.vertex(38.75, 23.4375);
+            p5.endShape();
+            p5.vertex(38.75, 55.4375);
+            p5.vertex(38.75, 67.8125);
+            p5.vertex(53.8125, 67.8125);
+            p5.bezierVertex(58.75, 67.8125, 61.125, 65.75, 61.125, 61.5625);
+            p5.vertex(61.125, 61.3125);
+            p5.bezierVertex(61.125, 57.375, 58.75, 55.4375, 53.8125, 55.4375);
+            p5.vertex(38.75, 55.4375);
+            p5.endShape();
+        }
+
+        function drawTree(w, h) {
+            p5.scale(w / 385.63, h / 87.5);
+            p5.strokeCap(p5.PROJECT);
+            p5.strokeJoin(p5.MITER);
+            p5.beginShape();
+            p5.vertex(385.625, 87.5);
+            p5.vertex(299.625, 87.5);
+            p5.vertex(299.625, 0);
+            p5.vertex(384.375, 0);
+            p5.vertex(384.375, 22.5);
+            p5.vertex(338.375, 22.5);
+            p5.vertex(338.375, 33.25);
+            p5.vertex(381.812, 33.25);
+            p5.vertex(381.812, 53.875);
+            p5.vertex(338.375, 53.875);
+            p5.vertex(338.375, 65);
+            p5.vertex(385.625, 65);
+            p5.vertex(385.625, 87.5);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(293.625, 87.5);
+            p5.vertex(207.625, 87.5);
+            p5.vertex(207.625, 0);
+            p5.vertex(292.375, 0);
+            p5.vertex(292.375, 22.5);
+            p5.vertex(246.375, 22.5);
+            p5.vertex(246.375, 33.25);
+            p5.vertex(289.812, 33.25);
+            p5.vertex(289.812, 53.875);
+            p5.vertex(246.375, 53.875);
+            p5.vertex(246.375, 65);
+            p5.vertex(293.625, 65);
+            p5.vertex(293.625, 87.5);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(137.875, 87.5);
+            p5.vertex(99.125, 87.5);
+            p5.vertex(99.125, 0);
+            p5.vertex(160.062, 0);
+            p5.bezierVertex(186.25, 0, 198.875, 8.875, 198.875, 27.3125);
+            p5.vertex(198.875, 27.5625);
+            p5.bezierVertex(198.875, 41, 192.938, 47.375, 180.562, 49.6875);
+            p5.vertex(180.562, 51);
+            p5.bezierVertex(187.938, 52.625, 191.812, 55.0625, 194, 63.5625);
+            p5.vertex(196.188, 72.0625);
+            p5.bezierVertex(198.375, 80.5625, 199.5, 83.4375, 202.312, 85.625);
+            p5.vertex(202.062, 87.5);
+            p5.vertex(160.938, 87.5);
+            p5.bezierVertex(159.5, 85.0625, 158.625, 82.5, 157.25, 75);
+            p5.vertex(155.875, 67.5);
+            p5.bezierVertex(154.5, 60, 152.688, 57.6875, 146, 57.6875);
+            p5.vertex(137.875, 57.6875);
+            p5.vertex(137.875, 87.5);
+            p5.endShape();
+            p5.vertex(137.875, 21.875);
+            p5.vertex(137.875, 37.6875);
+            p5.vertex(150.375, 37.6875);
+            p5.bezierVertex(
+                156.625,
+                37.6875,
+                159.688,
+                36.4375,
+                159.688,
+                30.0625,
+            );
+            p5.vertex(159.688, 29.8125);
+            p5.bezierVertex(159.688, 23.1875, 156.625, 21.875, 150.375, 21.875);
+            p5.vertex(137.875, 21.875);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(66.125, 87.5);
+            p5.vertex(27.375, 87.5);
+            p5.vertex(27.375, 26.25);
+            p5.vertex(0, 26.25);
+            p5.vertex(0, 0);
+            p5.vertex(93.5, 0);
+            p5.vertex(93.5, 26.25);
+            p5.vertex(66.125, 26.25);
+            p5.vertex(66.125, 87.5);
+            p5.endShape();
+        }
+
+        function drawStudio(w, h) {
+            p5.scale(w / 589.51, h / 91.25);
+            p5.strokeCap(p5.PROJECT);
+            p5.strokeJoin(p5.MITER);
+            p5.beginShape();
+            p5.vertex(533.572, 91.25);
+            p5.bezierVertex(495.884, 91.25, 477.634, 76.5625, 477.634, 46.0625);
+            p5.vertex(477.634, 45.8125);
+            p5.bezierVertex(477.634, 14.9375, 495.884, 0, 533.572, 0);
+            p5.bezierVertex(571.259, 0, 589.509, 14.9375, 589.509, 45.8125);
+            p5.vertex(589.509, 46.0625);
+            p5.bezierVertex(589.509, 76.5625, 571.259, 91.25, 533.572, 91.25);
+            p5.endShape();
+            p5.vertex(533.572, 66.875);
+            p5.bezierVertex(
+                544.322,
+                66.875,
+                549.509,
+                60.3125,
+                549.509,
+                46.6875,
+            );
+            p5.vertex(549.509, 45.125);
+            p5.bezierVertex(549.509, 31.125, 544.322, 24.375, 533.572, 24.375);
+            p5.bezierVertex(522.822, 24.375, 517.634, 31.125, 517.634, 45.125);
+            p5.vertex(517.634, 46.6875);
+            p5.bezierVertex(517.634, 60.3125, 522.822, 66.875, 533.572, 66.875);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(469.509, 89.375);
+            p5.vertex(430.759, 89.375);
+            p5.vertex(430.759, 1.875);
+            p5.vertex(469.509, 1.875);
+            p5.vertex(469.509, 89.375);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(369.509, 89.375);
+            p5.vertex(315.384, 89.375);
+            p5.vertex(315.384, 1.875);
+            p5.vertex(369.509, 1.875);
+            p5.bezierVertex(405.259, 1.875, 422.572, 16.0625, 422.572, 45.5);
+            p5.vertex(422.572, 45.75);
+            p5.bezierVertex(422.572, 75.1875, 405.259, 89.375, 369.509, 89.375);
+            p5.endShape();
+            p5.vertex(354.134, 25);
+            p5.vertex(354.134, 66.25);
+            p5.vertex(366.322, 66.25);
+            p5.bezierVertex(377.259, 66.25, 382.572, 59.75, 382.572, 46.375);
+            p5.vertex(382.572, 44.8125);
+            p5.bezierVertex(382.572, 31.4375, 377.259, 25, 366.322, 25);
+            p5.vertex(354.134, 25);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(255.509, 91.25);
+            p5.bezierVertex(220.822, 91.25, 204.072, 81.6875, 204.072, 57.9375);
+            p5.vertex(204.072, 1.875);
+            p5.vertex(242.822, 1.875);
+            p5.vertex(242.822, 54.6875);
+            p5.bezierVertex(242.822, 63.75, 246.947, 67.5, 255.509, 67.5);
+            p5.bezierVertex(263.697, 67.5, 267.572, 63.75, 267.572, 54.6875);
+            p5.vertex(267.572, 1.875);
+            p5.vertex(306.322, 1.875);
+            p5.vertex(306.322, 57.9375);
+            p5.bezierVertex(306.322, 81.6875, 289.822, 91.25, 255.509, 91.25);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(171.384, 89.375);
+            p5.vertex(132.634, 89.375);
+            p5.vertex(132.634, 28.125);
+            p5.vertex(105.259, 28.125);
+            p5.vertex(105.259, 1.875);
+            p5.vertex(198.759, 1.875);
+            p5.vertex(198.759, 28.125);
+            p5.vertex(171.384, 28.125);
+            p5.vertex(171.384, 89.375);
+            p5.endShape();
+            p5.beginShape();
+            p5.vertex(49.9467, 91.25);
+            p5.bezierVertex(
+                19.4467,
+                91.25,
+                -0.490808,
+                80.875,
+                0.00919247,
+                62.1875,
+            );
+            p5.vertex(38.6967, 59.875);
+            p5.bezierVertex(38.9467, 66.75, 43.9467, 69.375, 52.7592, 69.375);
+            p5.bezierVertex(
+                59.8217,
+                69.375,
+                63.1342,
+                68.0625,
+                63.1342,
+                64.8125,
+            );
+            p5.bezierVertex(63.1342, 61.5, 60.3217, 60.375, 44.9467, 57.75);
+            p5.vertex(29.5717, 55.125);
+            p5.bezierVertex(
+                14.2592,
+                52.5,
+                0.946692,
+                44.9375,
+                0.946692,
+                28.3125,
+            );
+            p5.bezierVertex(0.946692, 9.3125, 20.1342, 0, 50.1967, 0);
+            p5.bezierVertex(81.6967, 0, 99.6342, 11.875, 98.8217, 28.875);
+            p5.vertex(64.0092, 31.5625);
+            p5.bezierVertex(63.4467, 25.5, 59.5717, 21.875, 49.3217, 21.875);
+            p5.bezierVertex(41.7592, 21.875, 38.0092, 23.75, 38.0092, 26.625);
+            p5.bezierVertex(
+                38.0092,
+                29.3125,
+                38.9467,
+                30.4375,
+                54.3217,
+                32.9375,
+            );
+            p5.vertex(69.6967, 35.4375);
+            p5.bezierVertex(
+                85.0092,
+                37.9375,
+                101.509,
+                41.9375,
+                101.509,
+                60.625,
+            );
+            p5.bezierVertex(101.509, 80.3125, 81.5092, 91.25, 49.9467, 91.25);
+            p5.endShape();
+        }
+        p5.windowResized = () => p5.setup();
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>
