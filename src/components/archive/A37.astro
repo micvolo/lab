@@ -25,16 +25,15 @@
                     let x = ix * o.sizex;
                     let y = iy * o.sizey;
                     let sizey =
-                        o.sizex *
-                        Math.abs(
-                            p5.sin(p5.frameCount * 0.01 + ix / 10 + (iy % 2)),
+                        o.sizey *
+                        gaussian(
+                            ((p5.frameCount + x * 0.1) % 300) * 0.01,
+                            1.5,
+                            0.4,
                         );
 
-                    let sizey2 =
-                        o.sizex *
-                        Math.abs(
-                            p5.sin(p5.frameCount * 0.01 + iy / 100 + (iy % 3)),
-                        );
+                    if (iy % 2 === 0) sizey = o.sizey - sizey;
+
                     p5.push();
                     p5.translate(x, y + sizey);
                     drawS(o.sizex, o.sizey - sizey);
@@ -42,11 +41,17 @@
 
                     p5.push();
                     p5.translate(x, y);
-                    drawA(o.sizex, sizey);
+                    drawR(o.sizex, sizey);
                     p5.pop();
                 }
             }
         };
+
+        function gaussian(x, mu, sigma) {
+            const coefficient = 1 / (Math.sqrt(2 * Math.PI) * sigma);
+            const exponent = -((x - mu) ** 2) / (2 * sigma ** 2);
+            return coefficient * Math.exp(exponent);
+        }
 
         function drawS(w, h) {
             p5.scale(w / 81, h / 97);
