@@ -18,23 +18,43 @@ if (actual) {
     rand = Math.floor(Math.random() * total + 1);
 }
 ---
+
 <script>
     const total = +document.querySelector("nav").dataset.total;
     const actual = +document.querySelector("nav").dataset.actual;
-    let rand =  Math.floor(Math.random() * total + 1);
+    let rand = Math.floor(Math.random() * total + 1);
     if (actual && rand === actual) {
         while (rand === actual) {
             rand = Math.floor(Math.random() * total + 1);
-        } 
+        }
     }
-    document.querySelector<HTMLAnchorElement>('.rand').href = `/archive/a${rand}`;
+    document.querySelector<HTMLAnchorElement>(".rand").href =
+        `/archive/a${rand}`;
 </script>
 <div class="widget" transition:persist>
     <nav data-total={routes.length - 1} data-actual={actual}>
-        {actual && <a href=`/archive/a${prev}` class="prev">Prev</a>}
+        {
+            actual && (
+                <a href={`/archive/a${prev}`} class="prev">
+                    Prev
+                </a>
+            )
+        }
         <a href=`/archive/a${rand}` class="rand">Random</a>
-        {actual && <a href=`/archive/a${next}` class="next">Next</a>}
-        {actual && <a href="/" class="home">Home</a>}
+        {
+            actual && (
+                <a href={`/archive/a${next}`} class="next">
+                    Next
+                </a>
+            )
+        }
+        {
+            actual && (
+                <a href="/" class="home">
+                    Home
+                </a>
+            )
+        }
     </nav>
 </div>
 <style lang="scss">
