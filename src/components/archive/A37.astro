@@ -32,17 +32,28 @@
                             0.4,
                         );
 
-                    if (iy % 2 === 0) sizey = o.sizey - sizey;
+                    if (iy % 2 === 0) {
+                        sizey = o.sizey - sizey;
+                        p5.push();
+                        p5.translate(x, y + sizey);
+                        drawR(o.sizex, o.sizey - sizey);
+                        p5.pop();
 
-                    p5.push();
-                    p5.translate(x, y + sizey);
-                    drawS(o.sizex, o.sizey - sizey);
-                    p5.pop();
+                        p5.push();
+                        p5.translate(x, y);
+                        drawS(o.sizex, sizey);
+                        p5.pop();
+                    } else {
+                        p5.push();
+                        p5.translate(x, y + sizey);
+                        drawS(o.sizex, o.sizey - sizey);
+                        p5.pop();
 
-                    p5.push();
-                    p5.translate(x, y);
-                    drawR(o.sizex, sizey);
-                    p5.pop();
+                        p5.push();
+                        p5.translate(x, y);
+                        drawR(o.sizex, sizey);
+                        p5.pop();
+                    }
                 }
             }
         };
