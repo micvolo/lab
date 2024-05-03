@@ -48,7 +48,7 @@
             // @ts-ignore
             p5.clear();
             if (o.showImage) p5.image(o.img, 0, 0);
-            // getData();
+            getData();
             // draw();
         };
         function resize() {
@@ -56,6 +56,7 @@
                 o.img.resize(o.width, 0);
             }
             if (o.img.size) {
+                if ("ontouchstart" in document.documentElement) return;
                 o.img.size(o.width, (o.width * 480) / 640);
             }
         }
