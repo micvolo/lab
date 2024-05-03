@@ -60,6 +60,8 @@
             o.data = [];
             o.img.loadPixels();
 
+            if (!o.img.pixels) return;
+
             o.mainside = o.img.width;
             o.secondaryside = o.img.height;
             if (o.vertical) {
