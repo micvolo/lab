@@ -6,7 +6,7 @@
             sizex: 10,
             sizey: 10,
             elements: [],
-            showImage: false,
+            showImage: true,
             webcam: true,
             vertical: false,
         } as any;
@@ -29,14 +29,15 @@
                 o.img = p5.createCapture({
                     audio: false,
                     video: {
+                        width: 640,
+                        height: 480,
                         facingMode: "user",
                     },
                 });
                 o.img.elt.setAttribute("playsinline", "");
-
                 o.img.hide();
                 o.img.flipped = true;
-                resize();
+                // resize();
             } else {
                 resize();
                 p5.draw();
@@ -45,10 +46,10 @@
         };
         p5.draw = () => {
             // @ts-ignore
-            p5.clear();
+            // p5.clear();
             if (o.showImage) p5.image(o.img, 0, 0);
-            getData();
-            draw();
+            // getData();
+            // draw();
         };
         function resize() {
             if (o.img.resize) {
@@ -61,8 +62,6 @@
         function getData() {
             o.data = [];
             o.img.loadPixels();
-
-            if (!o.img.pixels) return;
 
             o.mainside = o.img.width;
             o.secondaryside = o.img.height;
