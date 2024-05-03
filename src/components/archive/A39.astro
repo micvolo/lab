@@ -26,7 +26,12 @@
             p5.createCanvas(o.width, o.height);
             p5.noStroke();
             if (o.webcam) {
-                o.img = p5.createCapture("video");
+                o.img = p5.createCapture({
+                    audio: false,
+                    video: {
+                        facingMode: "user",
+                    },
+                });
                 o.img.hide();
                 o.img.flipped = true;
                 resize();
