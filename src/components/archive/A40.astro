@@ -12,6 +12,8 @@
             webcam: false,
             vertical: false,
             pane: new Pane(),
+            startx: 0,
+            starty: 0,
         } as any;
 
         setupPanel();
@@ -45,20 +47,14 @@
             p5.createCanvas(o.width, o.height);
             p5.noStroke();
             if (o.webcam) {
-                o.img = p5.createCapture({
-                    audio: false,
-                    video: {
-                        width: 640,
-                        height: 480,
-                        facingMode: "user",
-                    },
-                });
+                o.img = p5.createCapture("video");
                 o.img.elt.setAttribute("playsinline", "");
                 o.img.hide();
                 o.img.flipped = true;
                 resize();
                 p5.loop();
             } else {
+                if (o.img.remove) o.img.remove();
                 resize();
                 p5.draw();
                 p5.noLoop();
@@ -67,13 +63,18 @@
         p5.draw = () => {
             // @ts-ignore
             p5.clear();
-            if (o.showImage) p5.image(o.img, 0, 0);
+            if (o.showImage) p5.image(o.img, o.startx, o.starty);
             getData();
             draw();
         };
         function resize() {
+            const hratio = o.width / o.img.width;
+            const wratio = o.height / o.img.height;
+            var r = Math.min(hratio, wratio);
+            o.startx = o.width / 2 - (o.img.width / 2) * r;
+            o.starty = o.height / 2 - (o.img.height / 2) * r;
             if (o.img.resize) {
-                o.img.resize(o.width, 0);
+                o.img.resize(o.img.width * r, o.img.height * r);
             }
             if (o.img.size) {
                 if ("ontouchstart" in document.documentElement) return;
@@ -110,11 +111,6 @@
 
                     // p5.fill(bright);
                     // p5.rect(j, i, o.sizex, o.sizey);
-
-                    let totaInfluence = o.elements.reduce(
-                        (acc, el) => acc + el.value,
-                        0,
-                    );
 
                     let t = Math.floor(bright / (255 / o.elements.length));
                     if (t > o.elements.length - 1) t = o.elements.length - 1;
@@ -160,7 +156,13 @@
                     sizey = o.sizex * (count + 1);
                 }
 
-                p5.image(o.elements[actual].img, posx, posy, sizex, sizey);
+                p5.image(
+                    o.elements[actual].img,
+                    posx + o.startx,
+                    posy + o.starty,
+                    sizex,
+                    sizey,
+                );
 
                 actual = t;
                 count = 0;
@@ -198,8 +200,8 @@
             });
             t.addBinding(o, "webcam");
 
-            t.addBinding(o, "sizex", { min: 1, max: 100, step: 1 });
-            t.addBinding(o, "sizey", { min: 1, max: 100, step: 1 });
+            t.addBinding(o, "sizex", { min: 1, max: 20, step: 1 });
+            t.addBinding(o, "sizey", { min: 1, max: 20, step: 1 });
             t.addBinding(o, "vertical");
             t.addBinding(o, "showImage");
         }
