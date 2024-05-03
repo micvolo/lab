@@ -3,20 +3,21 @@
     const container = document.querySelector(".p5") as HTMLElement;
     const sketch = (p5: P5) => {
         const o = {
-            sizex: 5,
-            sizey: 5,
+            sizex: 10,
+            sizey: 10,
             elements: [],
-            showImage: false,
-            webcam: false,
+            showImage: true,
+            webcam: true,
             vertical: false,
         } as any;
 
         p5.preload = () => {
             o.img = p5.loadImage("/projects/a38/1.webp");
 
-            o.elements.push(p5.loadImage("/projects/a38/studio.png"));
-            o.elements.push(p5.loadImage("/projects/a38/big.png"));
-            o.elements.push(p5.loadImage("/projects/a38/tree.png"));
+            o.elements.push(p5.loadImage("/projects/a38/mic.png"));
+            o.elements.push(p5.loadImage("/projects/a38/volo.png"));
+            o.elements.push(p5.loadImage("/projects/a38/stra.png"));
+            o.elements.push(p5.loadImage("/projects/a38/dev.png"));
         };
 
         p5.setup = () => {
