@@ -3,11 +3,11 @@
     const container = document.querySelector(".p5") as HTMLElement;
     const sketch = (p5: P5) => {
         const o = {
-            sizex: 5,
-            sizey: 5,
+            sizex: 10,
+            sizey: 10,
             elements: [],
             showImage: false,
-            webcam: false,
+            webcam: true,
             vertical: false,
         } as any;
 
@@ -32,13 +32,11 @@
                 p5.draw();
                 p5.noLoop();
             }
+            resize();
         };
         p5.draw = () => {
-            resize();
             p5.background(0);
-            if (o.showImage) {
-                p5.image(o.img, 0, 0);
-            }
+            if (o.showImage) p5.image(o.img, 0, 0);
             getData();
             draw();
         };
@@ -47,18 +45,26 @@
                 o.img.resize(o.width, 0);
             }
             if (o.img.size) {
-                o.img.size(o.width, (o.width * o.img.height) / o.img.width);
+                o.img.size(o.width, (o.width * 480) / 640);
             }
         }
         function getData() {
             o.data = [];
             o.img.loadPixels();
 
-            let mainside = o.img.width;
-            let secondaryside = o.img.height;
-            for (let i = 0; i < secondaryside; i++) {
-                for (let j = 0; j < mainside; j++) {
-                    let index = (j + i * mainside) * 4;
+            o.mainside = o.img.width;
+            o.secondaryside = o.img.height;
+            if (o.vertical) {
+                o.mainside = o.img.height;
+                o.secondaryside = o.img.width;
+            }
+            for (let i = 0; i < o.secondaryside; i++) {
+                for (let j = 0; j < o.mainside; j++) {
+                    let index = (j + i * o.mainside) * 4;
+
+                    if (o.vertical) {
+                        index = (i + j * o.secondaryside) * 4;
+                    }
 
                     let r = o.img.pixels[index];
                     let g = o.img.pixels[index + 1];
@@ -71,35 +77,46 @@
 
                     o.data.push(t);
 
-                    j = j + o.sizex - 1;
+                    j += o.sizex - 1;
                 }
-                i = i + o.sizey - 1;
+                i += o.sizey - 1;
             }
         }
 
         function draw() {
             let actual = o.data[0];
             let count = 0;
+
             for (let i = 0; i < o.data.length; i++) {
-                let x = i % Math.ceil(o.img.width / o.sizex);
-                let y = Math.floor(i / Math.ceil(o.img.width / o.sizex));
+                let l = Math.ceil(o.mainside / o.sizex);
+                let x = i % l;
+                let y = Math.floor(i / l);
+
+                if (o.vertical) {
+                    x = Math.floor(i / l);
+                    y = i % l;
+                }
+
                 let t = o.data[i];
 
-                if (
-                    actual === t &&
-                    x !== Math.ceil(o.img.width / o.sizex) - 1
-                ) {
+                if (actual === t && x !== l - 1 && y !== l - 1) {
                     count++;
                     continue;
                 }
 
-                p5.image(
-                    o.elements[actual],
-                    (x - count) * o.sizex,
-                    y * o.sizey,
-                    o.sizex * (count + 1),
-                    o.sizey,
-                );
+                let posx = (x - count) * o.sizex;
+                let posy = y * o.sizey;
+                let sizex = o.sizex * (count + 1);
+                let sizey = o.sizey;
+
+                if (o.vertical) {
+                    posx = x * o.sizey;
+                    posy = (y - count) * o.sizex;
+                    sizex = o.sizey;
+                    sizey = o.sizex * (count + 1);
+                }
+
+                p5.image(o.elements[actual], posx, posy, sizex, sizey);
 
                 actual = t;
                 count = 0;
