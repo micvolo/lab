@@ -7,10 +7,12 @@
             sizey: 5,
             elements: [],
             showImage: false,
+            webcam: false,
+            vertical: false,
         } as any;
 
         p5.preload = () => {
-            o.img = p5.loadImage("/projects/a38/1.jpg");
+            o.img = p5.loadImage("/projects/a38/1.webp");
 
             o.elements.push(p5.loadImage("/projects/a38/t.png"));
             o.elements.push(p5.loadImage("/projects/a38/b.png"));
@@ -18,23 +20,45 @@
         };
 
         p5.setup = () => {
-            o.data = [];
             o.width = container.clientWidth;
             o.height = container.clientHeight;
-
             p5.createCanvas(o.width, o.height);
-            p5.noStroke();
 
-            o.img.loadPixels();
-            o.img.resize(o.width, 0);
-            o.img.updatePixels();
+            if (o.webcam) {
+                o.img = p5.createCapture("video");
+                o.img.hide();
+                o.img.flipped = true;
+            } else {
+                p5.draw();
+                p5.noLoop();
+            }
+        };
+        p5.draw = () => {
+            resize();
+            p5.background(0);
             if (o.showImage) {
                 p5.image(o.img, 0, 0);
             }
+            getData();
+            draw();
+        };
+        function resize() {
+            if (o.img.resize) {
+                o.img.resize(o.width, 0);
+            }
+            if (o.img.size) {
+                o.img.size(o.width, (o.width * o.img.height) / o.img.width);
+            }
+        }
+        function getData() {
+            o.data = [];
+            o.img.loadPixels();
 
-            for (let starty = 0; starty < o.img.height; starty++) {
-                for (let startx = 0; startx < o.img.width; startx++) {
-                    let index = (startx + starty * o.img.width) * 4;
+            let mainside = o.img.width;
+            let secondaryside = o.img.height;
+            for (let i = 0; i < secondaryside; i++) {
+                for (let j = 0; j < mainside; j++) {
+                    let index = (j + i * mainside) * 4;
 
                     let r = o.img.pixels[index];
                     let g = o.img.pixels[index + 1];
@@ -47,11 +71,13 @@
 
                     o.data.push(t);
 
-                    startx = startx + o.sizex - 1;
+                    j = j + o.sizex - 1;
                 }
-                starty = starty + o.sizey - 1;
+                i = i + o.sizey - 1;
             }
+        }
 
+        function draw() {
             let actual = o.data[0];
             let count = 0;
             for (let i = 0; i < o.data.length; i++) {
@@ -78,7 +104,7 @@
                 actual = t;
                 count = 0;
             }
-        };
+        }
         p5.windowResized = () => p5.setup();
     };
     new P5(sketch, container);
