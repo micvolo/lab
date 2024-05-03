@@ -14,6 +14,7 @@
             pane: new Pane(),
             startx: 0,
             starty: 0,
+            pixelDensity: 5,
         } as any;
 
         setupPanel();
@@ -46,6 +47,8 @@
             o.height = container.clientHeight;
             o.canvas = p5.createCanvas(o.width, o.height);
             p5.noStroke();
+            p5.pixelDensity(o.pixelDensity);
+            p5.noSmooth();
             if (o.webcam) {
                 o.img = p5.createCapture("video");
                 o.img.elt.setAttribute("playsinline", "");
