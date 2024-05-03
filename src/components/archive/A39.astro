@@ -37,7 +37,7 @@
                 o.img.elt.setAttribute("playsinline", "");
                 o.img.hide();
                 o.img.flipped = true;
-                // resize();
+                resize();
             } else {
                 resize();
                 p5.draw();
@@ -46,7 +46,7 @@
         };
         p5.draw = () => {
             // @ts-ignore
-            // p5.clear();
+            p5.clear();
             if (o.showImage) p5.image(o.img, 0, 0);
             // getData();
             // draw();
