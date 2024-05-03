@@ -44,7 +44,7 @@
 
             o.width = container.clientWidth;
             o.height = container.clientHeight;
-            p5.createCanvas(o.width, o.height);
+            o.canvas = p5.createCanvas(o.width, o.height);
             p5.noStroke();
             if (o.webcam) {
                 o.img = p5.createCapture("video");
@@ -204,6 +204,15 @@
             t.addBinding(o, "sizey", { min: 1, max: 20, step: 1 });
             t.addBinding(o, "vertical");
             t.addBinding(o, "showImage");
+            t.addButton({ title: "Save" }).on("click", () => {
+                let c = o.canvas.get(
+                    o.startx,
+                    o.starty,
+                    o.img.width,
+                    o.img.height,
+                );
+                c.save("image.png");
+            });
         }
 
         function refreshPanel() {
