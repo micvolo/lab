@@ -1,0 +1,144 @@
+<script>
+    import P5 from "p5";
+    const container = document.querySelector(".p5") as HTMLElement;
+    const sketch = (p5: P5) => {
+        const o = {
+            sizex: 10,
+            sizey: 10,
+            elements: [],
+            showImage: false,
+            webcam: true,
+            vertical: false,
+        } as any;
+
+        p5.preload = () => {
+            o.img = p5.loadImage("/projects/a38/1.webp");
+
+            o.elements.push(p5.loadImage("/projects/a38/mic.png"));
+            o.elements.push(p5.loadImage("/projects/a38/volo.png"));
+            o.elements.push(p5.loadImage("/projects/a38/stra.png"));
+            o.elements.push(p5.loadImage("/projects/a38/dev.png"));
+        };
+
+        p5.setup = () => {
+            o.width = container.clientWidth;
+            o.height = container.clientHeight;
+            p5.createCanvas(o.width, o.height);
+            p5.noStroke();
+            if (o.webcam) {
+                o.img = p5.createCapture({
+                    audio: false,
+                    video: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "user",
+                    },
+                });
+                o.img.elt.setAttribute("playsinline", "");
+                o.img.hide();
+                o.img.flipped = true;
+                resize();
+            } else {
+                resize();
+                p5.draw();
+                p5.noLoop();
+            }
+        };
+        p5.draw = () => {
+            // @ts-ignore
+            p5.clear();
+            if (o.showImage) p5.image(o.img, 0, 0);
+            getData();
+            draw();
+        };
+        function resize() {
+            if (o.img.resize) {
+                o.img.resize(o.width, 0);
+            }
+            if (o.img.size) {
+                if ("ontouchstart" in document.documentElement) return;
+                o.img.size(o.width, (o.width * 480) / 640);
+            }
+        }
+        function getData() {
+            o.data = [];
+            o.img.loadPixels();
+
+            o.mainside = o.img.width;
+            o.secondaryside = o.img.height;
+            if (o.vertical) {
+                o.mainside = o.img.height;
+                o.secondaryside = o.img.width;
+            }
+            for (let i = 0; i < o.secondaryside; i++) {
+                for (let j = 0; j < o.mainside; j++) {
+                    let index = (j + i * o.mainside) * 4;
+
+                    if (o.vertical) {
+                        index = (i + j * o.secondaryside) * 4;
+                    }
+
+                    let r = o.img.pixels[index];
+                    let g = o.img.pixels[index + 1];
+                    let b = o.img.pixels[index + 2];
+
+                    let bright = 255 - (r * 0.299 + g * 0.587 + b * 0.114);
+
+                    // p5.fill(bright);
+                    // p5.rect(j, i, o.sizex, o.sizey);
+
+                    let t = Math.floor(bright / (255 / o.elements.length));
+                    if (t > o.elements.length - 1) t = o.elements.length - 1;
+
+                    o.data.push(t);
+
+                    j += o.sizex - 1;
+                }
+                i += o.sizey - 1;
+            }
+        }
+
+        function draw() {
+            let actual = o.data[0];
+            let count = 0;
+
+            for (let i = 0; i < o.data.length; i++) {
+                let l = Math.ceil(o.mainside / o.sizex);
+                let x = i % l;
+                let y = Math.floor(i / l);
+
+                if (o.vertical) {
+                    x = Math.floor(i / l);
+                    y = i % l;
+                }
+
+                let t = o.data[i];
+
+                if (actual === t && x !== l - 1 && y !== l - 1) {
+                    count++;
+                    continue;
+                }
+
+                let posx = (x - count) * o.sizex;
+                let posy = y * o.sizey;
+                let sizex = o.sizex * (count + 1);
+                let sizey = o.sizey;
+
+                if (o.vertical) {
+                    posx = x * o.sizey;
+                    posy = (y - count) * o.sizex;
+                    sizex = o.sizey;
+                    sizey = o.sizex * (count + 1);
+                }
+
+                p5.image(o.elements[actual], posx, posy, sizex, sizey);
+
+                actual = t;
+                count = 0;
+            }
+        }
+        p5.windowResized = () => p5.setup();
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>

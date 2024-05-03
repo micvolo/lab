@@ -1,0 +1,158 @@
+<script>
+    import * as THREE from "three";
+    import vertex from "@/shaders/a30/vert.glsl?raw";
+    import fragment from "@/shaders/a30/frag.glsl?raw";
+    import { Flowmap } from "@/scripts/a30/flowmap";
+
+    const imgSize = [1920, 1080];
+    const canvas = document.querySelector(".webgl");
+    const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    const camera = new THREE.OrthographicCamera(
+        window.innerWidth / -2,
+        window.innerWidth / 2,
+        window.innerHeight / 2,
+        window.innerHeight / -2,
+        1,
+        1000,
+    );
+    camera.position.z = 2;
+
+    const scene = new THREE.Scene();
+    let geometry = new THREE.PlaneGeometry(
+        window.innerWidth,
+        window.innerHeight,
+    );
+
+    const flow = new Flowmap(renderer, camera, {
+        falloff: 0.3,
+        dissipation: 0.99,
+    });
+
+    const material = new THREE.ShaderMaterial({
+        uniforms: {
+            uTime: { value: 0 },
+            res: {
+                value: new THREE.Vector4(
+                    window.innerWidth,
+                    window.innerHeight,
+                    1,
+                    1,
+                ),
+            },
+            tFlow: {
+                value: flow.value,
+            },
+        },
+        vertexShader: vertex,
+        fragmentShader: fragment,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    // MOUSE
+    const isTouchCapable = "ontouchstart" in window;
+    if (isTouchCapable) {
+        window.addEventListener("touchstart", updateMouse, false);
+        window.addEventListener("touchmove", updateMouse, { passive: false });
+    } else {
+        window.addEventListener("mousemove", updateMouse, false);
+    }
+    let lastTime;
+    const mouse = new THREE.Vector2();
+    const lastMouse = new THREE.Vector2();
+    const velocity = new THREE.Vector2();
+    function updateMouse(e) {
+        if (e.changedTouches && e.changedTouches.length) {
+            e.x = e.changedTouches[0].pageX;
+            e.y = e.changedTouches[0].pageY;
+        }
+        if (e.x === undefined) {
+            e.x = e.pageX;
+            e.y = e.pageY;
+        }
+        // Get mouse value in 0 to 1 range, with y flipped
+        mouse.set(e.x / window.innerWidth, 1.0 - e.y / window.innerHeight);
+        // Calculate velocity
+        if (!lastTime) {
+            // First frame
+            lastTime = performance.now();
+            lastMouse.set(e.x, e.y);
+        }
+
+        const deltaX = e.x - lastMouse.x;
+        const deltaY = e.y - lastMouse.y;
+
+        lastMouse.set(e.x, e.y);
+
+        let time = performance.now();
+
+        // Avoid dividing by 0
+        let delta = Math.max(10.4, time - lastTime);
+        lastTime = time;
+        velocity.x = deltaX / delta;
+        velocity.y = deltaY / delta;
+        // Flag update to prevent hanging velocity values when not moving
+        velocity.needsUpdate = true;
+    }
+
+    // RESIZE
+    function resize() {
+        let a1, a2;
+        var imageAspect = imgSize[1] / imgSize[0];
+        if (window.innerHeight / window.innerWidth < imageAspect) {
+            a1 = 1;
+            a2 = window.innerHeight / window.innerWidth / imageAspect;
+        } else {
+            a1 = (window.innerWidth / window.innerHeight) * imageAspect;
+            a2 = 1;
+        }
+        mesh.material.uniforms.res.value = new THREE.Vector4(
+            window.innerWidth,
+            window.innerHeight,
+            a1,
+            a2,
+        );
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        flow.aspect = window.innerWidth / window.innerHeight;
+    }
+    window.addEventListener("resize", resize, false);
+    resize();
+
+    const clock = new THREE.Clock();
+    // ANIMATION
+    animate();
+    function animate() {
+        requestAnimationFrame(animate);
+
+        if (!velocity.needsUpdate) {
+            mouse.set(-1, -1);
+            velocity.set(0, 0);
+        }
+        velocity.needsUpdate = false;
+        // flow
+        flow.aspect = window.innerWidth / window.innerHeight;
+        flow.mouse.copy(mouse);
+        flow.velocity.lerp(velocity, 0.1);
+        flow.update();
+        material.uniforms.uTime.value += 1 * clock.getDelta();
+        renderer.render(scene, camera);
+    }
+</script>
+<canvas class="webgl"></canvas>
+<style lang="scss">
+    :global(html, body) {
+        position: fixed;
+        inset: 0;
+    }
+    .webgl {
+        position: fixed;
+        inset: 0;
+    }
+</style>

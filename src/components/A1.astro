@@ -1,0 +1,68 @@
+<div id="bg"></div>
+<style lang="scss">
+    #bg {
+        // position: relative;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        // filter: blur(25px) saturate(2.5) contrast(1.5);
+        animation: blur 5s linear infinite;
+        background: 100% / 100% no-repeat url("/projects/a1/bg.jpg");
+        // transform: scale(1.25);
+
+        &::before {
+            content: "";
+            position: absolute;
+            right: 0;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            animation: rotate 20s linear infinite;
+            opacity: 1;
+            background: inherit;
+            mix-blend-mode: color-dodge;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            animation: rotate 30s linear infinite;
+            animation-direction: reverse;
+            background: inherit;
+            opacity: 0.85;
+            mix-blend-mode: difference;
+        }
+    }
+
+    @keyframes blur {
+        from {
+            filter: none;
+        }
+        to {
+            filter: none;
+        }
+        50% {
+            filter: blur(25px) saturate(2.5) contrast(1.5);
+        }
+    }
+    @keyframes rotate {
+        0% {
+            blur: 0;
+            transform: rotate(0deg) scale(1.25);
+            filter: hue-rotate(0deg);
+            backdrop-filter: hue-rotate(0deg);
+        }
+        50% {
+            transform: rotate(180deg) scale(1);
+        }
+        100% {
+            transform: rotate(360deg) scale(1.25);
+            filter: hue-rotate(360deg);
+            backdrop-filter: hue-rotate(360deg);
+        }
+    }
+</style>

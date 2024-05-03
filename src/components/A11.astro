@@ -1,0 +1,128 @@
+<script>
+    import P5 from "p5";
+    import { Pane } from "tweakpane";
+    const container = document.querySelector(".p5") as HTMLElement;
+    const sketch = (p5: P5) => {
+        const PARAMS = {
+            squareSize: 10,
+            margin: 10,
+            speed: 1,
+            string: "a",
+            fps: 60,
+        };
+        const pane = new Pane({
+            title: "Parameters",
+            expanded: true,
+        });
+        pane.addBinding(PARAMS, "squareSize", { min: 0, max: 100 });
+        pane.addBinding(PARAMS, "margin", { min: 0, max: 100 });
+        pane.addBinding(PARAMS, "speed", { min: 0, max: 10 });
+        pane.addBinding(PARAMS, "string");
+        pane.addBinding(PARAMS, "fps", {
+            view: "graph",
+            min: 0,
+            max: 100,
+        });
+        let width,
+            height,
+            minsize,
+            totalW,
+            rows,
+            cols,
+            marginLeft,
+            marginTop,
+            involved,
+            svg;
+        p5.preload = () => {
+            svg = p5.loadImage("/projects/a11/a.png");
+        };
+        p5.setup = () => {
+            container.style.opacity = "1";
+
+            width = container.clientWidth;
+            height = container.clientHeight;
+
+            totalW = PARAMS.squareSize + PARAMS.margin;
+            minsize = Math.min(width, height);
+            rows = Math.floor(width / totalW);
+            cols = Math.floor(height / totalW);
+
+            marginLeft = (width - rows * totalW) / 2;
+            marginTop = (height - cols * totalW) / 2;
+            involved = [];
+
+            p5.createCanvas(width, height);
+            p5.background("#FFFFFF");
+            p5.fill("black");
+            p5.strokeWeight(0);
+            p5.frameRate(60);
+
+            // FONT
+            p5.textSize(minsize / Math.sqrt(PARAMS.string.length));
+            p5.textAlign(p5.CENTER, p5.CENTER);
+            p5.textFont("Helvetica");
+            p5.push();
+            p5.fill("red");
+            p5.text(PARAMS.string, width / 2, height / 2);
+            p5.imageMode(p5.CENTER);
+            let imgW = width * 0.8;
+            // p5.image(svg, width/2, height/2, imgW, imgW*9/16)
+            p5.pop();
+            for (let ix = 0; ix < rows; ix++) {
+                for (let iy = 0; iy < cols; iy++) {
+                    let x = totalW * ix + marginLeft + totalW / 2;
+                    let y = totalW * iy + marginTop + totalW / 2;
+                    let p = p5.get(x, y);
+                    if (p[0] == 255 && p[1] == 0 && p[2] == 0) {
+                        involved.push([ix, iy]);
+                    }
+                }
+            }
+            // p5.background("#FFFFFF");
+        };
+
+        p5.draw = () => {
+            PARAMS.fps = p5.frameRate();
+            //  p5.background("#FFFFFF");
+            for (let ix = 0; ix < rows; ix++) {
+                for (let iy = 0; iy < cols; iy++) {
+                    let x = totalW * ix + marginLeft;
+                    let y = totalW * iy + marginTop;
+                    p5.push();
+                    p5.translate(x, y);
+                    p5.translate(totalW / 2, totalW / 2);
+                    p5.rectMode(p5.CENTER);
+                    if (involved.some(([x1, y1]) => x1 == ix && y1 == iy)) {
+                        // p5.rotateZ(p5.frameCount * PARAMS.speed);
+                        let noise = p5.noise(
+                            x * PARAMS.speed * 0.01,
+                            y * PARAMS.speed * 0.01,
+                            p5.frameCount * PARAMS.speed * 0.01,
+                        );
+                        let noise1 = p5.noise(
+                            ix * PARAMS.speed,
+                            iy * PARAMS.speed,
+                            p5.frameCount * PARAMS.speed * 0.01,
+                        );
+                        p5.rotate(noise);
+                        p5.rect(
+                            0,
+                            0,
+                            noise1 * PARAMS.squareSize,
+                            noise * PARAMS.squareSize,
+                        );
+                    } else {
+                        p5.square(0, 0, PARAMS.squareSize);
+                    }
+
+                    p5.get(0, 0);
+                    p5.pop();
+                }
+            }
+        };
+        p5.windowResized = () => p5.setup();
+        pane.on("change", () => p5.setup());
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>

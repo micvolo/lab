@@ -1,0 +1,121 @@
+<script>
+    import P5 from "p5";
+
+    const sketch = (p5: P5) => {
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let squareSize = 10;
+        let margin = 50;
+        let totalW = squareSize + margin;
+
+        let velocity = 1;
+
+        let rows = Math.floor(width / totalW);
+        let cols = Math.floor(height / totalW);
+        let marginLeft = (width - rows * totalW) / 2;
+        let marginTop = (height - cols * totalW) / 2;
+
+        let hole = {
+            x: Math.floor(Math.random() * rows),
+            y: Math.floor(Math.random() * cols),
+        };
+        let move = {
+            startx: hole.x,
+            starty: hole.y,
+            x: hole.x * totalW + marginLeft,
+            y: hole.y * totalW + marginTop,
+        };
+
+        p5.setup = () => {
+            p5.createCanvas(width, height);
+            p5.background("#FFFFFF");
+        };
+
+        p5.draw = () => {
+            p5.background("#FFFFFF");
+            p5.fill("#000000");
+            for (let ix = 0; ix < rows; ix++) {
+                for (let iy = 0; iy < cols; iy++) {
+                    let x = totalW * ix + marginLeft;
+                    let y = totalW * iy + marginTop;
+
+                    if (
+                        move.y == hole.y * totalW + marginTop &&
+                        move.x == hole.x * totalW + marginLeft
+                    ) {
+                        const previousx = hole.x;
+                        const previousy = hole.y;
+                        hole.x = move.startx;
+                        hole.y = move.starty;
+                        do {
+                            switch (Math.floor(Math.random() * 4 + 1)) {
+                                case 1:
+                                    move.startx = hole.x - 1;
+                                    move.starty = hole.y;
+                                    break;
+                                case 2:
+                                    move.startx = hole.x + 1;
+                                    move.starty = hole.y;
+                                    break;
+                                case 3:
+                                    move.startx = hole.x;
+                                    move.starty = hole.y - 1;
+                                    break;
+                                case 4:
+                                    move.startx = hole.x;
+                                    move.starty = hole.y + 1;
+                                    break;
+                            }
+                        } while (
+                            move.starty < 0 ||
+                            move.starty >= cols ||
+                            move.startx < 0 ||
+                            move.startx >= rows ||
+                            (move.startx == previousx &&
+                                move.starty == previousy)
+                        );
+                        move.x = move.startx * totalW + marginLeft;
+                        move.y = move.starty * totalW + marginTop;
+                        console.log(hole, move);
+                    }
+
+                    if (ix == move.startx && iy == move.starty) {
+                        // p5.fill("red");
+                        x = move.x;
+                        y = move.y;
+                        // move.x++;
+                        // move.y++;
+                        if (move.y > hole.y * totalW + marginTop) {
+                            move.y = move.y - velocity;
+                        }
+                        if (move.y < hole.y * totalW + marginTop) {
+                            move.y = move.y + velocity;
+                        }
+                        if (move.x > hole.x * totalW + marginLeft) {
+                            move.x = move.x - velocity;
+                        }
+                        if (move.x < hole.x * totalW + marginLeft) {
+                            move.x = move.x + velocity;
+                        }
+                    }
+
+                    if (ix == hole.x && iy == hole.y) continue;
+
+                    p5.push();
+                    p5.translate(x, y);
+                    p5.translate(totalW / 2, totalW / 2);
+                    p5.rectMode(p5.CENTER);
+                    p5.square(0, 0, squareSize);
+                    p5.pop();
+                }
+            }
+        };
+        p5.windowResized = () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            p5.resizeCanvas(width, height);
+        };
+    };
+    new P5(sketch, document.querySelector("#p5") as HTMLElement);
+</script>
+<div id="p5" class="p5"></div>

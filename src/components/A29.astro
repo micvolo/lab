@@ -1,0 +1,154 @@
+<script>
+    import * as THREE from "three";
+    import vertex from "@/shaders/a29/vert.glsl?raw";
+    import fragment from "@/shaders/a29/frag.glsl?raw";
+    import finalFrag from "@/shaders/a29/frag3.glsl?raw";
+    import gsap from "gsap";
+    const data = {
+        mouse: { x: 0, y: 0, k: 1 },
+        progress: 0,
+        speed: 0.02,
+        velocity: { x: 0, y: 0 },
+        client: { x: 0, y: 0 },
+    };
+    const canvas = document.querySelector(".webgl");
+    const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    const camera = new THREE.OrthographicCamera(
+        window.innerWidth / -2,
+        window.innerWidth / 2,
+        window.innerHeight / 2,
+        window.innerHeight / -2,
+        1,
+        1000,
+    );
+    camera.position.z = 2;
+
+    const scene = new THREE.Scene();
+    let geometry = new THREE.PlaneGeometry(
+        window.innerWidth,
+        window.innerHeight,
+    );
+
+    let textureA = new THREE.WebGLRenderTarget(
+        window.innerWidth,
+        window.innerHeight,
+        {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.LinearFilter,
+            format: THREE.RGBAFormat,
+            type: THREE.FloatType,
+        },
+    );
+    let textureB = new THREE.WebGLRenderTarget(
+        window.innerWidth,
+        window.innerHeight,
+        {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.LinearFilter,
+            format: THREE.RGBAFormat,
+            type: THREE.FloatType,
+        },
+    );
+    const bufferScene = new THREE.Scene();
+
+    const material = new THREE.ShaderMaterial({
+        uniforms: {
+            uAspectRatio: { value: new THREE.Vector2(1, 1) },
+            uResolution: {
+                value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+            },
+            uMouse: { value: new THREE.Vector2(data.mouse.x, data.mouse.y) },
+            uProgress: { value: data.progress },
+            // uTexture: { value: texture },
+            uTime: { value: 0 },
+            uVelocity: {
+                value: new THREE.Vector2(0, 0),
+            },
+            tMap: {
+                value: new THREE.TextureLoader().load(
+                    "/projects/a29/bgFrag.png",
+                ),
+            },
+            tWater: {
+                value: new THREE.TextureLoader().load(
+                    "/projects/a29/bgFrag.png",
+                ),
+            },
+        },
+        side: THREE.DoubleSide,
+        // wireframe: true,
+        // transparent: true,
+        vertexShader: vertex,
+        fragmentShader: fragment,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    bufferScene.add(mesh);
+
+    const finalMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+            uAspectRatio: { value: new THREE.Vector2(1, 1) },
+            uResolution: {
+                value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+            },
+            tFlow: {
+                value: textureB.texture,
+            },
+            tWater: {
+                value: new THREE.TextureLoader().load(
+                    "/projects/a29/bgFrag.png",
+                ),
+            },
+        },
+        vertexShader: vertex,
+        fragmentShader: finalFrag,
+    });
+    // finalMaterial.uniforms.tMap.value = textureB.texture;
+    const finalMesh = new THREE.Mesh(geometry, finalMaterial);
+    scene.add(finalMesh);
+    animate();
+    function animate() {
+        requestAnimationFrame(animate);
+
+        material.uniforms.uTime.value += data.speed;
+        material.uniforms.uProgress.value = data.progress;
+        material.uniforms.uMouse.value.x +=
+            (data.mouse.x - material.uniforms.uMouse.value.x) * data.mouse.k;
+        material.uniforms.uMouse.value.y +=
+            (data.mouse.y - material.uniforms.uMouse.value.y) * data.mouse.k;
+
+        material.uniforms.uVelocity.value.lerp(
+            new THREE.Vector2(data.velocity.x, data.velocity.y),
+            0.5,
+        );
+
+        renderer.setRenderTarget(textureB);
+        renderer.render(bufferScene, camera);
+        var t = textureA;
+        textureA = textureB;
+        textureB = t;
+        material.uniforms.tMap.value = textureA.texture;
+        renderer.setRenderTarget(null);
+        renderer.render(scene, camera);
+    }
+    let lastTime = 0;
+    window.addEventListener("mousemove", ({ clientX: x, clientY: y }) => {
+        gsap.to(data.velocity, {
+            x: x - data.client.x,
+            y: y - data.client.y,
+            ease: "linear",
+            duration: 0.1,
+        });
+        // From 0 to 1
+        data.mouse.x = x / window.innerWidth;
+        data.mouse.y = 1 - y / window.innerHeight;
+        data.client.x = x;
+        data.client.y = y;
+    });
+</script>
+<canvas class="webgl"></canvas>

@@ -1,0 +1,61 @@
+<script>
+    import P5 from "p5";
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    const sketch = (p5: P5) => {
+        const params = {
+            rows: 10,
+            cols: 10,
+            gridw: 0.8,
+            gridh: 0.8,
+            freq: 0.001,
+            amp: 0.2,
+            frame: 0,
+            animate: true,
+            lineCap: "butt",
+        };
+        p5.setup = () => {
+            p5.createCanvas(width, height);
+            p5.background("#FFFFFF");
+            p5.frameRate(60);
+        };
+
+        p5.draw = () => {
+            p5.background("#FFFFFF");
+            p5.fill("#000");
+            // p5.square(x, 50, 100);
+            for (let ix = 0; ix < params.rows; ix++) {
+                for (let iy = 0; iy < params.cols; iy++) {
+                    const w = width / params.rows;
+                    const h = height / params.cols;
+                    let x = w * ix + (w * (1 - params.gridw)) / 2;
+                    let y = h * iy + (h * (1 - params.gridh)) / 2;
+
+                    const n = p5.noise(x, y, p5.frameCount * 0.005);
+
+                    // p5.translate(x, y)
+                    p5.push();
+                    p5.translate(x, y);
+                    p5.translate(
+                        (w * params.gridw) / 2,
+                        (h * params.gridh) / 2,
+                    );
+                    p5.rotate(p5.PI * n);
+                    p5.rectMode(p5.CENTER);
+                    p5.rect(0, 0, w * params.gridw, h * params.gridh * n);
+                    p5.pop();
+                }
+            }
+        };
+        p5.windowResized = () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            p5.resizeCanvas(width, height);
+        };
+    };
+
+    new P5(sketch, document.querySelector("#p5") as HTMLElement);
+</script>
+<div id="p5" class="p5"></div>

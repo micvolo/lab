@@ -1,0 +1,299 @@
+<script>
+    import P5 from "p5";
+    import opentype from "opentype.js";
+    import { Pane } from "tweakpane";
+
+    const container = document.querySelector(".p5") as HTMLElement;
+    const PARAMS = {
+        string: "CIAO",
+        size: 200,
+        mouseSize: 150,
+        velocity: 0.01,
+        delay: 0,
+        keep: true,
+        copyEverything: false,
+        return: true,
+        fps: 60,
+        stroke: false,
+        strokeWeight: 1,
+        bgcolor: "#000000",
+        textcolor: "#FFFFFF",
+        strokecolor: "#000000",
+    };
+
+    const pane = new Pane({
+        title: "Parameters",
+        expanded: false,
+    });
+    pane.addBinding(PARAMS, "string");
+    pane.addBinding(PARAMS, "size", { min: 0, max: 1000 });
+    pane.addBinding(PARAMS, "mouseSize", { min: 0, max: 2000 });
+    pane.addBinding(PARAMS, "velocity", { min: 0.001, max: 0.1 });
+    pane.addBinding(PARAMS, "delay", { min: 0, max: 3 });
+    pane.addBinding(PARAMS, "copyEverything");
+    pane.addBinding(PARAMS, "return");
+    pane.addBinding(PARAMS, "keep");
+    pane.addBinding(PARAMS, "stroke");
+    pane.addBinding(PARAMS, "strokeWeight", { min: 0, max: 10 });
+    pane.addBinding(PARAMS, "bgcolor");
+    pane.addBinding(PARAMS, "textcolor");
+    pane.addBinding(PARAMS, "strokecolor");
+    pane.addBinding(PARAMS, "fps", {
+        view: "graph",
+        min: 0,
+        max: 100,
+    });
+
+    let file = null;
+
+    const sketch = (p5: P5) => {
+        pane.addButton({
+            title: "Upload font",
+        }).on("click", () => {
+            const input = document.createElement("input");
+            input.setAttribute("type", "file");
+            input.style.opacity = "0";
+            input.style.position = "fixed";
+            document.body.appendChild(input);
+            input.addEventListener(
+                "input",
+                (ev) => {
+                    file = input.files[0];
+                    document.body.removeChild(input);
+                    p5.setup();
+                },
+                { once: true },
+            );
+            input.click();
+        });
+
+        pane.addButton({
+            title: "Save Screenshot",
+        }).on("click", () => {
+            p5.saveCanvas(`STRASTUDIO-${Date.now()}`, "png");
+        });
+
+        let width,
+            height,
+            pg,
+            pg2,
+            fontData,
+            font,
+            paths,
+            textW,
+            textH = 0,
+            traslate,
+            traslatingVertex: { mouse; vertex }[] = [];
+
+        p5.preload = () => {
+            fontData = p5.loadBytes("/fonts/greed.ttf");
+        };
+        p5.setup = async () => {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            p5.createCanvas(width, height);
+            pg = p5.createGraphics(width, height);
+            pg2 = p5.createGraphics(width, height);
+            container.style.opacity = "1";
+
+            font = opentype.parse(fontData.bytes.buffer);
+
+            if (file) {
+                font = opentype.parse(await file.arrayBuffer());
+            }
+            paths = font.getPaths(PARAMS.string, 0, 0, PARAMS.size);
+            textW = font.getAdvanceWidth(PARAMS.string, PARAMS.size);
+            textH = 0;
+            for (const path of paths) {
+                for (const c of path.commands) {
+                    c.startX = c.x;
+                    c.startY = c.y;
+                    c.startX1 = c.x1;
+                    c.startY1 = c.y1;
+                    c.startX2 = c.x2;
+                    c.startY2 = c.y2;
+                }
+                const h = Math.abs(
+                    path.getBoundingBox().y1 - path.getBoundingBox().y2,
+                );
+                if (h > textH) textH = h;
+            }
+            traslate = {
+                x: (width - textW) / 2,
+                y: (height - textH) / 2 + textH,
+            };
+            p5.background(PARAMS.bgcolor);
+            p5.strokeWeight(PARAMS.strokeWeight);
+            if (PARAMS.stroke) {
+                p5.stroke(PARAMS.strokecolor);
+                p5.noFill();
+            } else {
+                p5.stroke(PARAMS.strokecolor);
+                p5.fill(PARAMS.textcolor);
+            }
+        };
+
+        p5.draw = () => {
+            p5.background(PARAMS.bgcolor);
+            PARAMS.fps = p5.frameRate();
+            pg2.clear();
+
+            if (!PARAMS.keep) {
+                pg.clear();
+            }
+
+            pg.strokeWeight(PARAMS.strokeWeight);
+            if (PARAMS.stroke) {
+                pg.stroke(PARAMS.strokecolor);
+                pg.noFill();
+            } else {
+                pg.stroke(PARAMS.strokecolor);
+                pg.fill(PARAMS.textcolor);
+            }
+
+            pg.push();
+            pg.translate(traslate.x, traslate.y);
+            for (const path of paths) {
+                pg.beginShape();
+                let shapes = 0;
+                for (const c of path.commands) {
+                    switch (c.type) {
+                        case "M":
+                            if (shapes > 0) {
+                                pg.beginContour();
+                            }
+                            pg.vertex(c.x, c.y);
+                            break;
+                        case "Z":
+                            if (shapes > 0) {
+                                pg.endContour();
+                            }
+                            shapes++;
+                            break;
+                        case "L":
+                            pg.vertex(c.x, c.y);
+                            break;
+                        case "Q":
+                            pg.quadraticVertex(c.x1, c.y1, c.x, c.y);
+                            break;
+                        case "C":
+                            pg.bezierVertex(c.x1, c.y1, c.x2, c.y2, c.x, c.y);
+                            break;
+                    }
+                }
+                pg.endShape();
+            }
+            pg.pop();
+
+            if (p5.mouseIsPressed && traslatingVertex?.length > 0) {
+                pg2.push();
+                pg2.stroke("red");
+                pg2.noFill();
+                pg2.circle(p5.mouseX, p5.mouseY, PARAMS.mouseSize);
+                pg2.pop();
+                const list = traslatingVertex[traslatingVertex.length - 1];
+                if (list) {
+                    for (const v of list.vertex) {
+                        v.x += p5.mouseX - list.mouse.x;
+                        v.y += p5.mouseY - list.mouse.y;
+                        if (PARAMS.copyEverything) {
+                            v.x1 += p5.mouseX - list.mouse.x;
+                            v.y1 += p5.mouseY - list.mouse.y;
+                            v.x2 += p5.mouseX - list.mouse.x;
+                            v.y2 += p5.mouseY - list.mouse.y;
+                        }
+                    }
+                    list.mouse.x = p5.mouseX;
+                    list.mouse.y = p5.mouseY;
+                }
+            }
+
+            if (PARAMS.return) {
+                for (const path of paths) {
+                    for (const c of path.commands) {
+                        if (c.lerp) {
+                            c.x = p5.lerp(c.startX, c.x, c.lerpValue);
+                            c.y = p5.lerp(c.startY, c.y, c.lerpValue);
+                            if (PARAMS.copyEverything) {
+                                c.x1 = p5.lerp(c.startX1, c.x1, c.lerpValue);
+                                c.y1 = p5.lerp(c.startY1, c.y1, c.lerpValue);
+                                c.x2 = p5.lerp(c.startX2, c.x2, c.lerpValue);
+                                c.y2 = p5.lerp(c.startY2, c.y2, c.lerpValue);
+                            }
+                            c.lerpValue -= PARAMS.velocity;
+                            if (c.lerpValue <= 0) {
+                                c.lerp = false;
+                                c.lerpValue = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            p5.image(pg, 0, 0);
+            p5.image(pg2, 0, 0);
+        };
+        p5.mousePressed = () => {
+            let vmouse = p5.createVector(p5.mouseX, p5.mouseY);
+            let vertex = [];
+
+            for (const p of paths) {
+                for (const c of p.commands) {
+                    let vpoint = p5.createVector(
+                        c.x + traslate.x,
+                        c.y + traslate.y,
+                    );
+                    if (vpoint.dist(vmouse) < PARAMS.mouseSize / 2) {
+                        c.lerp = false;
+                        c.lerpValue = 1;
+                        vertex.push(c);
+                    }
+                }
+            }
+            if (vertex && vertex.length > 0) {
+                traslatingVertex.push({
+                    mouse: { x: p5.mouseX, y: p5.mouseY },
+                    vertex,
+                });
+            }
+        };
+        p5.mouseReleased = () => {
+            setTimeout(() => {
+                const list = traslatingVertex[traslatingVertex.length - 1];
+                if (list) {
+                    for (const v of list.vertex) {
+                        v.lerp = true;
+                        v.lerpValue = 1;
+                    }
+                }
+                traslatingVertex.shift();
+            }, PARAMS.delay * 1000);
+        };
+        p5.windowResized = () => {
+            if (container.clientWidth !== width) p5.setup();
+        };
+        // p5.keyReleased = () => {
+        //     if (p5.key == 's' || p5.key == 'S') p5.saveCanvas('strastudio', 'png');
+        // }
+        pane.on("change", (c) => {
+            const dontRefresh = [
+                "keep",
+                "bgcolor",
+                "textcolor",
+                "strokecolor",
+                "strokeWeight",
+                "mouseSize",
+                "velocity",
+                "delay",
+                "copyEverything",
+                "return",
+                "stroke",
+            ];
+            if (dontRefresh.includes(c.presetKey)) {
+                return;
+            }
+            p5.setup();
+        });
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>

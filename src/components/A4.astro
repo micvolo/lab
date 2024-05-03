@@ -1,0 +1,54 @@
+<script>
+    import P5 from "p5";
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const params = {
+        cols: 10,
+        rows: 10,
+        scaleMin: 1,
+        scaleMax: 30,
+        freq: 0.001,
+        amp: 0.2,
+        frame: 0,
+        animate: true,
+        lineCap: "butt",
+    };
+
+    const sketch = (p5: P5) => {
+        let pg: P5.Graphics;
+        let canvas: P5.Renderer;
+
+        const cols = params.cols;
+        const rows = params.rows;
+        const numCells = cols * rows;
+        const gridw = width * 0.8;
+        const gridh = height * 0.8;
+        const cellw = gridw / cols;
+        const cellh = gridh / rows;
+        const margx = (width - gridw) * 0.5;
+        const margy = (height - gridh) * 0.5;
+
+        p5.setup = () => {
+            canvas = p5.createCanvas(width, height);
+            // p5.frameRate(10)
+        };
+
+        p5.draw = () => {
+            if (p5.mouseIsPressed) {
+                p5.fill(0);
+            } else {
+                p5.fill(255);
+            }
+            p5.ellipse(p5.mouseX, p5.mouseY, 80, 80);
+        };
+        p5.windowResized = () => {
+            console.log("resized");
+            p5.resizeCanvas(width, height);
+        };
+    };
+
+    new P5(sketch, document.querySelector("#p5") as HTMLElement);
+</script>
+<div id="p5" class="p5"></div>

@@ -1,0 +1,127 @@
+<script src="@/scripts/a33/main"></script>
+<script>
+    import P5 from "p5";
+
+    const container = document.querySelector(".p5") as HTMLElement;
+    const PARAMS = {
+        num: 30,
+    };
+
+    const sketch = (p5: P5) => {
+        let width, height, middle;
+
+        p5.setup = async () => {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            p5.createCanvas(width, height);
+            container.style.opacity = "1";
+            p5.stroke(`#${Math.floor(Math.random() * 16777215).toString(16)}`);
+            p5.strokeWeight(1);
+            middle = Math.floor((PARAMS.num - 1) / 2);
+        };
+
+        p5.draw = () => {
+            // @ts-ignore
+            // PARAMS.num = window.pos.z * 10 + 50;
+            // middle = Math.floor((PARAMS.num - 1)/2);
+            p5.clear();
+            for (let i = 0; i < PARAMS.num; i++) {
+                let x = p5.mouseX;
+                let y = p5.mouseY;
+                if (i === middle) {
+                    p5.push();
+                    p5.strokeWeight(3);
+                    p5.line(x, 0, x, height);
+                    p5.line(0, y, width, y);
+                    p5.pop();
+                } else if (i > middle) {
+                    x = width - p5.mouseX;
+                    y = height - p5.mouseY;
+                    const j = i - middle;
+                    let vx = (x / (PARAMS.num - middle)) * j + p5.mouseX;
+                    let vy = (y / (PARAMS.num - middle)) * j + p5.mouseY;
+
+                    p5.line(vx, 0, vx, height);
+                    p5.line(0, vy, width, vy);
+                } else if (i < middle) {
+                    let vx = (x / (PARAMS.num - middle - 1)) * (i + 1);
+                    let vy = (y / (PARAMS.num - middle - 1)) * (i + 1);
+                    p5.line(vx, 0, vx, height);
+                    p5.line(0, vy, width, vy);
+                }
+            }
+        };
+        p5.windowResized = () => p5.setup();
+    };
+    new P5(sketch, container);
+</script>
+<div class="cursor"></div>
+<div class="cursor1">
+    <svg
+        width="20vw"
+        height="20vw"
+        viewBox="0 0 141 102"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path
+            d="M0.574 101V0.899993H32.749C49.909 0.899993 54.342 6.33399 54.342 25.21V44.515C54.342 63.248 49.909 68.825 32.749 68.825H24.884V101H0.574ZM24.884 45.802H30.032V23.923H24.884V45.802ZM58.2488 101V0.899993H82.5588V101H58.2488ZM119.318 101.715H108.736C91.5756 101.715 87.1426 96.281 87.1426 77.405V24.495C87.1426 5.61899 91.5756 0.184994 108.736 0.184994H119.318C136.478 0.184994 140.911 5.61899 140.911 24.495V77.405C140.911 96.281 136.478 101.715 119.318 101.715ZM111.453 23.208V78.692H116.601V23.208H111.453Z"
+            fill="white"></path>
+    </svg>
+</div>
+<div class="p5"></div>
+<style lang="scss">
+    .cursor,
+    .cursor1,
+    .pio {
+        position: fixed;
+        width: 12px;
+        height: 12px;
+        mix-blend-mode: difference;
+        background-color: white;
+        border-radius: 100%;
+        opacity: 0;
+        z-index: 9999;
+        pointer-events: none;
+        transform-origin: center;
+        transform: translate(-50%, -50%) scale(1);
+        transition:
+            opacity 0.2s,
+            transform 0.2s,
+            height 0.2s,
+            width 0.2s,
+            border-radius 0.2s,
+            translate 0.2s;
+    }
+    svg {
+        opacity: 0;
+        transform: translate(calc(-50% + 18px), calc(-50% + 12px));
+        transition: opacity 0.2s;
+    }
+    .cursor1 {
+        width: 24px;
+        height: 24px;
+    }
+    .p5 {
+        overflow: hidden;
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+    }
+    :global(.handsfree-debugger) {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 15rem;
+        height: auto;
+        border: 1px solid greenyellow;
+    }
+
+    :global(.handsfree-canvas-video) {
+        filter: grayscale(1);
+        -webkit-filter: grayscale(1);
+        filter: grayscale(100%);
+    }
+</style>

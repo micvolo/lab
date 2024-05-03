@@ -1,0 +1,198 @@
+---
+const phrases = ["your heart", "is beating", "really fast"].map((p) =>
+    p.split(""),
+);
+const poem = `The heart that beats within our chest,
+A tireless muscle, never at rest,
+Pumping blood throughout our frame,
+Keeping us alive, its eternal aim.
+
+But sometimes, things can go astray,
+And the heart may falter, in dismay,
+A pain so sharp, it takes our breath,
+A heart attack, a brush with death.
+
+The world seems to blur and spin,
+As the heart fights to win,
+Against the blockage that threatens life,
+A race against time, to end the strife.
+
+The paramedics come with skill and care,
+To bring the heart back from despair,
+Rushing to the hospital with flashing light,
+To save the heart, with all their might.
+
+The doctors work with deft precision,
+To heal the heart, without condition,
+To bring it back to a steady beat,
+A triumph over the heart's defeat.
+
+So cherish every moment of your days,
+And take care of your heart in every way,
+For it beats within your chest, so true,
+A precious gift, given just to you.`;
+---
+
+<script>
+    import P5 from "p5";
+    import gsap from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const container = document.querySelector(".p5") as HTMLElement;
+    const PARAMS = {
+        size: 0.2,
+        opacity: 0,
+    };
+
+    const sketch = (p5: P5) => {
+        let width, height, size;
+        p5.setup = () => {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            size = Math.max(width, height);
+            p5.createCanvas(width, height, p5.WEBGL);
+            p5.stroke("red");
+            container.style.opacity = "1";
+        };
+
+        p5.draw = () => {
+            p5.fill(0, 0, 0, 255 * PARAMS.opacity);
+            p5.rotateX(p5.frameCount * 0.01);
+            p5.rotateY(p5.frameCount * 0.01);
+            p5.box(size * PARAMS.size);
+        };
+        p5.windowResized = () => {
+            if (container.clientWidth !== width) p5.setup();
+        };
+    };
+    new P5(sketch, container);
+
+    gsap.fromTo(
+        PARAMS,
+        { size: 0 },
+        {
+            size: 0.3,
+            repeat: -1,
+            yoyo: true,
+            ease: "elastic.out(1.5, .5)",
+            duration: 2,
+            repeatDelay: 0.5,
+        },
+    );
+
+    document.querySelectorAll("[data-p]").forEach((element) => {
+        gsap.fromTo(
+            element.children,
+            { y: "100%" },
+            {
+                y: 0,
+                stagger: 0.1,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: element,
+                    toggleActions: "restart reverse restart reverse",
+                },
+            },
+        );
+    });
+
+    const t = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+    document.querySelectorAll(".words").forEach((words) => {
+        t.fromTo(
+            words.children,
+            { y: "100%" },
+            { y: 0, stagger: 0.1, ease: "power1.out" },
+        );
+        t.to(words.children, { opacity: 0, stagger: 0.05, ease: "linear" });
+    });
+
+    window.onscroll = () => {
+        const scrollHeight =
+            document.documentElement.scrollHeight -
+            document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop;
+        const scrolled = (scrollTop / scrollHeight) * 100;
+        PARAMS.opacity = scrolled / 100;
+    };
+</script>
+<div class="p5"></div>
+{
+    phrases.map((p, i) => (
+        <div class={`words w${i + 1}`}>
+            {p.map((l) => (
+                <span>{l}</span>
+            ))}
+        </div>
+    ))
+}
+<div class="poem">
+    {
+        poem.split(`\n\n`).map((p) => (
+            <div class="paragraph">
+                {p.split("\n").map((l) => (
+                    <div data-p>
+                        {l.split(" ").map((w) => (
+                            <div>{w} </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        ))
+    }
+</div>
+<style lang="scss">
+    .p5 {
+        position: fixed;
+        inset: 0;
+    }
+    @font-face {
+        font-family: "Pressio";
+        src: url("/fonts/pressio.woff") format("woff");
+        font-weight: normal;
+        font-style: normal;
+    }
+    .words {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        font-size: 48vw;
+        text-align: center;
+        white-space: pre;
+        overflow: hidden;
+        line-height: 80%;
+        font-family: "Pressio";
+        color: red;
+        mix-blend-mode: difference;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        span {
+            transform: translateY(100%);
+        }
+    }
+    .poem {
+        margin-top: 100vh;
+        white-space: pre;
+        font-size: 5vw;
+        letter-spacing: -0.5vw;
+        font-weight: bold;
+        color: red;
+        mix-blend-mode: difference;
+        display: flex;
+        flex-wrap: wrap;
+        [data-p] {
+            overflow: hidden;
+            > * {
+                display: inline-block;
+                transform: translateY(100%);
+            }
+        }
+    }
+    .paragraph {
+        margin-bottom: 4rem;
+    }
+</style>

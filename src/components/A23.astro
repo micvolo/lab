@@ -1,0 +1,128 @@
+<script>
+    import {
+        HandLandmarker,
+        FilesetResolver,
+    } from "https://cdn.skypack.dev/@mediapipe/tasks-vision@0.1.0-alpha-13";
+
+    let handLandmarker = undefined;
+    let runningMode = "IMAGE";
+    let enableWebcamButton: HTMLButtonElement;
+    let webcamRunning: Boolean = false;
+
+    const videoWidth = "1280px";
+    const videoHeight = "720px";
+
+    const createHandLandmarker = async () => {
+        const vision = await FilesetResolver.forVisionTasks(
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.1.0-alpha-13/wasm"
+        );
+        handLandmarker = await HandLandmarker.createFromOptions(vision, {
+            baseOptions: {
+                modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
+            },
+            runningMode: runningMode,
+            numHands: 4,
+        });
+        enableCam();
+    };
+    createHandLandmarker();
+
+    const video = document.getElementById("webcam") as HTMLVideoElement;
+    const canvasElement = document.getElementById(
+        "output_canvas"
+    ) as HTMLCanvasElement;
+    const canvasCtx = canvasElement.getContext("2d");
+
+    function enableCam() {
+        if (!handLandmarker) {
+            console.log("Wait! objectDetector not loaded yet.");
+            return;
+        }
+        webcamRunning = true;
+
+        const constraints = {
+            video: true,
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+            video.srcObject = stream;
+            video.addEventListener("loadeddata", predictWebcam);
+        });
+    }
+
+    async function predictWebcam() {
+        canvasElement.style.height = videoHeight;
+        video.style.height = videoHeight;
+        canvasElement.style.width = videoWidth;
+        video.style.width = videoWidth;
+
+        if (runningMode === "IMAGE") {
+            runningMode = "VIDEO";
+            await handLandmarker.setOptions({ runningMode: "VIDEO" });
+        }
+        let startTimeMs = performance.now();
+        const results = handLandmarker.detectForVideo(video, startTimeMs);
+
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        if (results.landmarks) {
+            for (const landmarks of results.landmarks) {
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
+                    color: "#00FF00",
+                    lineWidth: 5,
+                });
+                drawLandmarks(canvasCtx, landmarks, {
+                    color: "#FF0000",
+                    lineWidth: 2,
+                });
+            }
+        }
+        canvasCtx.restore();
+        if (webcamRunning === true) {
+            window.requestAnimationFrame(predictWebcam);
+        }
+    }
+</script>
+<link
+    href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css"
+    rel="stylesheet"
+/>
+<script
+    src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"
+></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+    crossorigin="anonymous"
+></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"
+    crossorigin="anonymous"
+></script>
+
+<video id="webcam" autoplay playsinline></video>
+<canvas class="output_canvas" id="output_canvas" width="1280" height="720"
+></canvas>
+
+<style>
+    video#webcam {
+        transform: rotateY(180deg);
+        position: absolute;
+        top: 0;
+        right: 0;
+        /* display: none !important; */
+        max-width: 20%;
+        max-height: 10%;
+    }
+
+    canvas {
+        z-index: 1;
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100vh !important;
+        object-fit: contain;
+        transform: rotateY(180deg);
+    }
+</style>

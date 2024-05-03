@@ -1,0 +1,166 @@
+<script>
+    import P5 from "p5";
+    import { Pane } from "tweakpane";
+    const container = document.querySelector(".p5") as HTMLElement;
+    const sketch = (p5: P5) => {
+        const PARAMS = {
+            squareSize: 1,
+            margin: 20,
+            speed: 3,
+            count: 0.2,
+            fps: 60,
+        };
+        const pane = new Pane({
+            title: "Parameters",
+            expanded: true,
+        });
+        pane.addBinding(PARAMS, "squareSize", { min: 0, max: 100 });
+        pane.addBinding(PARAMS, "margin", { min: 0, max: 100 });
+        pane.addBinding(PARAMS, "speed", { min: 0, max: 10 });
+        pane.addBinding(PARAMS, "count", { min: 0, max: 1 });
+        pane.addBinding(PARAMS, "fps", {
+            view: "graph",
+            min: 0,
+            max: 100,
+        });
+        let width,
+            height,
+            totalW,
+            rows,
+            cols,
+            marginLeft,
+            marginTop,
+            numbers,
+            holes,
+            moves;
+        p5.setup = () => {
+            width = container.clientWidth;
+            height = container.clientHeight;
+
+            totalW = PARAMS.squareSize + PARAMS.margin;
+
+            rows = Math.floor(width / totalW);
+            cols = Math.floor(height / totalW);
+
+            marginLeft = (width - rows * totalW) / 2;
+            marginTop = (height - cols * totalW) / 2;
+
+            numbers = Math.floor(cols * rows * PARAMS.count);
+            holes = Array(numbers)
+                .fill({})
+                .map(() => ({
+                    x: Math.floor(Math.random() * rows),
+                    y: Math.floor(Math.random() * cols),
+                    color: Math.random() > 0.5 ? "#FFFFFF" : "#000000",
+                }));
+            moves = Array(numbers)
+                .fill({})
+                .map((_, i) => ({
+                    startx: holes[i].x,
+                    starty: holes[i].y,
+                    x: holes[i].x * totalW + marginLeft,
+                    y: holes[i].y * totalW + marginTop,
+                }));
+
+            p5.createCanvas(width, height);
+            p5.background("#FFFFFF");
+            p5.fill("black");
+            p5.strokeWeight(0);
+            p5.frameRate(60);
+            container.style.opacity = "1";
+        };
+
+        p5.draw = () => {
+            PARAMS.fps = p5.frameRate();
+
+            for (let ix = 0; ix < rows; ix++) {
+                for (let iy = 0; iy < cols; iy++) {
+                    let x = totalW * ix + marginLeft;
+                    let y = totalW * iy + marginTop;
+                    for (let i = 0; i < numbers; i++) {
+                        let hole = holes[i];
+                        let move = moves[i];
+                        if (
+                            move.y == hole.y * totalW + marginTop &&
+                            move.x == hole.x * totalW + marginLeft
+                        ) {
+                            const previousx = hole.x;
+                            const previousy = hole.y;
+                            hole.x = move.startx;
+                            hole.y = move.starty;
+                            do {
+                                switch (Math.floor(Math.random() * 4 + 1)) {
+                                    case 1:
+                                        move.startx = hole.x - 1;
+                                        move.starty = hole.y;
+                                        break;
+                                    case 2:
+                                        move.startx = hole.x + 1;
+                                        move.starty = hole.y;
+                                        break;
+                                    case 3:
+                                        move.startx = hole.x;
+                                        move.starty = hole.y - 1;
+                                        break;
+                                    case 4:
+                                        move.startx = hole.x;
+                                        move.starty = hole.y + 1;
+                                        break;
+                                }
+                            } while (
+                                move.starty < 0 ||
+                                move.starty >= cols ||
+                                move.startx < 0 ||
+                                move.startx >= rows ||
+                                (move.startx == previousx &&
+                                    move.starty == previousy)
+                            );
+                            move.x = move.startx * totalW + marginLeft;
+                            move.y = move.starty * totalW + marginTop;
+                        }
+
+                        if (ix == move.startx && iy == move.starty) {
+                            x = move.x;
+                            y = move.y;
+                            let movement = totalW * 0.01 * PARAMS.speed;
+                            if (move.y >= hole.y * totalW + marginTop) {
+                                move.y = move.y - movement;
+                            }
+                            if (move.y < hole.y * totalW + marginTop) {
+                                move.y = move.y + movement;
+                            }
+                            if (move.x >= hole.x * totalW + marginLeft) {
+                                move.x = move.x - movement;
+                            }
+                            if (move.x < hole.x * totalW + marginLeft) {
+                                move.x = move.x + movement;
+                            }
+                            if (
+                                +Math.abs(
+                                    move.x - (hole.x * totalW + marginLeft),
+                                ).toFixed(2) < movement &&
+                                +Math.abs(
+                                    move.y - (hole.y * totalW + marginTop),
+                                ).toFixed(2) < movement
+                            ) {
+                                move.x = hole.x * totalW + marginLeft;
+                                move.y = hole.y * totalW + marginTop;
+                            }
+                        }
+                    }
+
+                    p5.push();
+                    p5.translate(x, y);
+                    p5.translate(totalW / 2, totalW / 2);
+                    p5.rectMode(p5.CENTER);
+                    p5.square(0, 0, PARAMS.squareSize);
+                    p5.pop();
+                }
+            }
+        };
+        p5.windowResized = () => p5.setup();
+        pane.on("change", () => p5.setup());
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>

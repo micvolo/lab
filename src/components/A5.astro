@@ -1,0 +1,50 @@
+<script>
+    import P5 from "p5";
+
+    const container = document.querySelector(".p5") as HTMLElement;
+    const PARAMS = {
+        size: 0.2,
+        opacity: 0,
+    };
+
+    // write simple 3d text with p5js webgl
+
+    let width, height, size, g, minSize
+    const sketch = (p5: P5) => {
+        p5.preload = () => {
+            // p5.textFont('Helvetica');
+            p5.loadFont('/fonts/pressio.otf');
+        }
+        p5.setup = () => {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            minSize = Math.min(width, height);
+            p5.createCanvas(width, height, p5.WEBGL);
+            g = p5.createGraphics(minSize/2, minSize/2);
+            // p5.fill("#ED225D");
+            p5.stroke('white')
+
+            g.fill('white');
+            // g.background('black')
+            g.textAlign(p5.CENTER);
+            g.textSize(minSize/30);
+            g.text("Stra Studio",minSize/4,minSize/4);
+        };
+
+        p5.draw = () => {
+            p5.background(0);
+            p5.texture(g);
+            p5.rotateX(p5.frameCount * 0.01);
+            p5.rotateY(p5.frameCount * 0.01);
+            p5.box(minSize/2);
+            // p5.sphere(minSize/4, 10, 3);
+            // p5.plane(minSize);
+        };
+        p5.windowResized = () => {
+            if (container.clientWidth !== width) p5.setup();
+        };
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>
+<style lang="scss"></style>

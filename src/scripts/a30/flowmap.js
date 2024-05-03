@@ -34,7 +34,7 @@ export class Flowmap {
         );
         const material = new THREE.ShaderMaterial({
             uniforms: {
-                tMap: { value: new THREE.TextureLoader().load("/images/bgFrag.png") },
+                tMap: { value: new THREE.TextureLoader().load("/projects/a29/bgFrag.png") },
                 uFalloff: { value: this.options.falloff * 0.5 },
                 uAlpha: { value: this.options.alpha },
                 uDissipation: { value: this.options.dissipation },
