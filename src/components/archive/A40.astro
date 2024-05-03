@@ -14,7 +14,7 @@
             pane: new Pane(),
             startx: 0,
             starty: 0,
-            pixelDensity: 5,
+            pixelDensity: 3,
         } as any;
 
         setupPanel();
@@ -40,7 +40,7 @@
             });
         };
 
-        p5.setup = () => {
+        p5.setup = async () => {
             refreshPanel();
 
             o.width = container.clientWidth;
@@ -54,6 +54,9 @@
                 o.img.elt.setAttribute("playsinline", "");
                 o.img.hide();
                 o.img.flipped = true;
+                await new Promise((r) => {
+                    o.img.elt.addEventListener("playing", r);
+                });
                 resize();
                 p5.loop();
             } else {
@@ -80,8 +83,7 @@
                 o.img.resize(o.img.width * r, o.img.height * r);
             }
             if (o.img.size) {
-                if ("ontouchstart" in document.documentElement) return;
-                o.img.size(o.width, (o.width * 480) / 640);
+                o.img.size(o.img.width * r, o.img.height * r);
             }
         }
 
@@ -203,18 +205,18 @@
             });
             t.addBinding(o, "webcam");
 
-            t.addBinding(o, "sizex", { min: 1, max: 20, step: 1 });
-            t.addBinding(o, "sizey", { min: 1, max: 20, step: 1 });
+            t.addBinding(o, "sizex", { min: 1, max: 50, step: 1 });
+            t.addBinding(o, "sizey", { min: 1, max: 50, step: 1 });
             t.addBinding(o, "vertical");
             t.addBinding(o, "showImage");
-            t.addButton({ title: "Save" }).on("click", () => {
+            t.addButton({ title: "Save Image" }).on("click", () => {
                 let c = o.canvas.get(
                     o.startx,
                     o.starty,
                     o.img.width,
                     o.img.height,
                 );
-                c.save("image.png");
+                c.save(`micvolo-${new Date().toISOString()}.png`);
             });
         }
 
@@ -272,11 +274,12 @@
                         "input",
                         async () => {
                             const f = input.files[0];
+                            let img;
                             await new Promise((r) => {
-                                o.elements.push(
-                                    p5.loadImage(URL.createObjectURL(f), r),
-                                );
+                                img = p5.loadImage(URL.createObjectURL(f), r);
                             });
+                            img.resize(200, 0);
+                            o.elements.push(img);
                             p5.setup();
                         },
                         { once: true },
