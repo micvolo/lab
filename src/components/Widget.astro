@@ -30,6 +30,22 @@ if (actual) {
     }
     document.querySelector<HTMLAnchorElement>(".rand").href =
         `/archive/a${rand}`;
+
+    // on press of "s" save canvas screenshot
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "s") {
+            const canvas = document.querySelector(
+                "canvas",
+            ) as HTMLCanvasElement;
+            if (!canvas) return;
+            canvas.toBlob((blob) => {
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `micvolo-${new Date().toISOString()}.png`;
+                a.click();
+            });
+        }
+    });
 </script>
 <div class="widget" transition:persist>
     <nav data-total={routes.length - 1} data-actual={actual}>

@@ -14,28 +14,31 @@
         p5.preload = () => {
             o.img = p5.loadImage("/projects/a38/1.webp");
 
-            o.elements.push(p5.loadImage("/projects/a38/t.png"));
-            o.elements.push(p5.loadImage("/projects/a38/b.png"));
-            o.elements.push(p5.loadImage("/projects/a38/s.png"));
+            o.elements.push(p5.loadImage("/projects/a38/mic.png"));
+            o.elements.push(p5.loadImage("/projects/a38/volo.png"));
+            o.elements.push(p5.loadImage("/projects/a38/stra.png"));
+            o.elements.push(p5.loadImage("/projects/a38/dev.png"));
         };
 
         p5.setup = () => {
             o.width = container.clientWidth;
             o.height = container.clientHeight;
             p5.createCanvas(o.width, o.height);
-
+            p5.noStroke();
             if (o.webcam) {
                 o.img = p5.createCapture("video");
                 o.img.hide();
                 o.img.flipped = true;
+                resize();
             } else {
+                resize();
                 p5.draw();
                 p5.noLoop();
             }
-            resize();
         };
         p5.draw = () => {
-            p5.background(0);
+            // @ts-ignore
+            p5.clear();
             if (o.showImage) p5.image(o.img, 0, 0);
             getData();
             draw();
@@ -70,7 +73,10 @@
                     let g = o.img.pixels[index + 1];
                     let b = o.img.pixels[index + 2];
 
-                    let bright = r * 0.299 + g * 0.587 + b * 0.114;
+                    let bright = 255 - (r * 0.299 + g * 0.587 + b * 0.114);
+
+                    // p5.fill(bright);
+                    // p5.rect(j, i, o.sizex, o.sizey);
 
                     let t = Math.floor(bright / (255 / o.elements.length));
                     if (t > o.elements.length - 1) t = o.elements.length - 1;
