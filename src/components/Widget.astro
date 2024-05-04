@@ -51,16 +51,16 @@ if (actual) {
     <nav data-total={routes.length - 1} data-actual={actual}>
         {
             actual && (
-                <a href={`/projects/a${prev}`} class="prev">
-                    Prev
+                <a href={`/projects/a${next}`} class="next">
+                    Next
                 </a>
             )
         }
         <a href=`/projects/a${rand}` class="rand">Random</a>
         {
             actual && (
-                <a href={`/projects/a${next}`} class="next">
-                    Next
+                <a href={`/projects/a${prev}`} class="prev">
+                    Prev
                 </a>
             )
         }
