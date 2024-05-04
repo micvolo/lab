@@ -2,18 +2,16 @@
 import Layout from "@layouts/Layout.astro";
 import fs from "node:fs/promises";
 
-const pages = await fs.readdir("./src/pages/archive");
+const pages = await fs.readdir("./src/pages/projects");
 const routes = pages
 	.map((p) => p.substring(0, p.lastIndexOf(".")))
 	.sort((a, b) => +a.replace(/^\D+/g, "") - +b.replace(/^\D+/g, ""))
 	.reverse();
-// const list = await Astro.glob("../components/archive/a1.astro");
-// console.log(list);
 ---
 
 <Layout>
 	<main>
-		{routes.map((a) => <a href={`/archive/${a}`}>{a}</a>)}
+		{routes.map((a) => <a href={`/projects/${a}`}>{a}</a>)}
 	</main>
 </Layout>
 <style lang="scss">

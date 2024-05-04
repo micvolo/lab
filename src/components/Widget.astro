@@ -1,7 +1,7 @@
 ---
 import fs from "node:fs/promises";
 
-const pages = await fs.readdir("./src/pages/archive");
+const pages = await fs.readdir("./src/pages/projects");
 const routes = pages
     .map((p) => p.substring(0, p.lastIndexOf(".")))
     .sort((a, b) => +a.replace(/^\D+/g, "") - +b.replace(/^\D+/g, ""));
@@ -29,7 +29,7 @@ if (actual) {
         }
     }
     document.querySelector<HTMLAnchorElement>(".rand").href =
-        `/archive/a${rand}`;
+        `/projects/a${rand}`;
 
     // on press of "s" save canvas screenshot
     document.addEventListener("keydown", (e) => {
@@ -51,15 +51,15 @@ if (actual) {
     <nav data-total={routes.length - 1} data-actual={actual}>
         {
             actual && (
-                <a href={`/archive/a${prev}`} class="prev">
+                <a href={`/projects/a${prev}`} class="prev">
                     Prev
                 </a>
             )
         }
-        <a href=`/archive/a${rand}` class="rand">Random</a>
+        <a href=`/projects/a${rand}` class="rand">Random</a>
         {
             actual && (
-                <a href={`/archive/a${next}`} class="next">
+                <a href={`/projects/a${next}`} class="next">
                     Next
                 </a>
             )
