@@ -1,0 +1,65 @@
+<script>
+    import P5 from "p5";
+
+    const container = document.querySelector(".p5") as HTMLElement;
+    const sketch = (p5: P5) => {
+        const o = {
+            alpha: 0,
+            beta: 0,
+            frame: 0,
+        } as any;
+
+        p5.setup = () => {
+            o.width = container.clientWidth;
+            o.height = container.clientHeight;
+            o.canvas = p5.createCanvas(o.width, o.height);
+        };
+        p5.draw = () => {
+            // p5.background(0);
+            drawFunction();
+            o.alpha += 0.01 * Math.pow(1000000000, o.frame * 0.002);
+            if (o.beta < 1) o.beta += 0.01;
+            o.frame++;
+        };
+
+        function drawFunction() {
+            let scale = 100;
+            let startX = -o.width / 2 / scale;
+            let endX = o.width / 2 / scale;
+            let increment = 0.01;
+
+            p5.beginShape();
+            p5.noFill();
+            p5.stroke("red");
+            p5.strokeWeight(0.5);
+            for (let x = startX; x <= endX; x += increment) {
+                let y = hearth(x, o.alpha, o.beta) * scale;
+                let graphX = p5.map(x, startX, endX, 0, o.width);
+                let graphY = p5.map(
+                    y,
+                    -o.height / 2,
+                    o.height / 2,
+                    o.height,
+                    0,
+                );
+                p5.vertex(graphX, graphY);
+            }
+            p5.endShape();
+        }
+
+        function hearth(x: number, alpha: number, beta: number) {
+            let e = Math.E;
+            let pi = Math.PI;
+            let y =
+                Math.cbrt(Math.pow(x, 2)) * beta +
+                (e / 3) *
+                    Math.sqrt(pi - Math.pow(x, 2) * beta) *
+                    Math.sin(alpha * pi * x);
+            return y;
+        }
+
+        p5.windowResized = () => p5.setup();
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>
