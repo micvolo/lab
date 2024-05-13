@@ -1,5 +1,6 @@
 <script>
     import P5 from "p5";
+    import { Pane } from "tweakpane";
 
     const container = document.querySelector(".p5") as HTMLElement;
     const sketch = (p5: P5) => {
@@ -7,33 +8,50 @@
             alpha: 0,
             beta: 0,
             frame: 0,
+            increment: 0.01,
+            size: 100,
+            speed: 0.01,
+            straEffect: false,
+            rainbow: false,
+            pane: new Pane(),
         } as any;
+
+        setupPanel();
 
         p5.setup = () => {
             o.width = container.clientWidth;
             o.height = container.clientHeight;
             o.canvas = p5.createCanvas(o.width, o.height);
+            p5.stroke("red");
         };
         p5.draw = () => {
-            // p5.background(0);
+            if (o.frame % 300 === 0) {
+                p5.background(0);
+                o.frame = 0;
+                o.alpha = 0;
+                o.beta = 0;
+            }
+            if (o.straEffect) p5.background(0);
+            o.alpha += o.speed * Math.pow(1000000, o.frame * 0.001);
+
+            if (o.rainbow)
+                p5.stroke(`hsl(${Math.floor((o.frame * 5) % 360)}, 100%, 50%)`);
+
+            if (o.beta < 1) o.beta += o.speed;
+
             drawFunction();
-            o.alpha += 0.01 * Math.pow(1000000000, o.frame * 0.002);
-            if (o.beta < 1) o.beta += 0.01;
+
             o.frame++;
         };
 
         function drawFunction() {
-            let scale = 100;
-            let startX = -o.width / 2 / scale;
-            let endX = o.width / 2 / scale;
-            let increment = 0.01;
+            let startX = -o.width / 2 / o.size;
+            let endX = o.width / 2 / o.size;
 
             p5.beginShape();
             p5.noFill();
-            p5.stroke("red");
-            p5.strokeWeight(0.5);
-            for (let x = startX; x <= endX; x += increment) {
-                let y = hearth(x, o.alpha, o.beta) * scale;
+            for (let x = startX; x <= endX; x += o.increment) {
+                let y = hearth(x, o.alpha, o.beta) * o.size;
                 let graphX = p5.map(x, startX, endX, 0, o.width);
                 let graphY = p5.map(
                     y,
@@ -59,6 +77,22 @@
         }
 
         p5.windowResized = () => p5.setup();
+
+        function setupPanel() {
+            o.pane.addBinding(o, "size", { min: 1, max: 500, step: 1 });
+            o.pane.addBinding(o, "speed", {
+                min: 0.001,
+                max: 0.1,
+                step: 0.001,
+            });
+            o.pane.addBinding(o, "increment", {
+                min: 0.01,
+                max: 0.1,
+                step: 0.01,
+            });
+            o.pane.addBinding(o, "straEffect");
+            o.pane.addBinding(o, "rainbow");
+        }
     };
     new P5(sketch, container);
 </script>
