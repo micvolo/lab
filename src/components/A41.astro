@@ -11,8 +11,9 @@
             increment: 0.01,
             size: 100,
             speed: 0.01,
+            resetTiming: 300,
             straEffect: false,
-            rainbow: false,
+            rainbow: true,
             pane: new Pane(),
         } as any;
 
@@ -25,7 +26,7 @@
             p5.stroke("red");
         };
         p5.draw = () => {
-            if (o.frame % 300 === 0) {
+            if (o.frame % o.resetTiming === 0) {
                 p5.background(0);
                 o.frame = 0;
                 o.alpha = 0;
@@ -85,10 +86,10 @@
                 max: 0.1,
                 step: 0.001,
             });
-            o.pane.addBinding(o, "increment", {
-                min: 0.01,
-                max: 0.1,
-                step: 0.01,
+            o.pane.addBinding(o, "resetTiming", {
+                min: 120,
+                max: 600,
+                step: 1,
             });
             o.pane.addBinding(o, "straEffect");
             o.pane.addBinding(o, "rainbow");
