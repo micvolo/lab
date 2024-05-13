@@ -52,7 +52,7 @@
             p5.beginShape();
             p5.noFill();
             for (let x = startX; x <= endX; x += o.increment) {
-                let y = hearth(x, o.alpha, o.beta) * o.size;
+                let y = heart(x, o.alpha, o.beta) * o.size;
                 let graphX = p5.map(x, startX, endX, 0, o.width);
                 let graphY = p5.map(
                     y,
@@ -66,7 +66,7 @@
             p5.endShape();
         }
 
-        function hearth(x: number, alpha: number, beta: number) {
+        function heart(x: number, alpha: number, beta: number) {
             let e = Math.E;
             let pi = Math.PI;
             let y =
