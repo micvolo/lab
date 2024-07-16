@@ -1,0 +1,100 @@
+<script>
+    import P5 from "p5";
+    import { Pane } from "tweakpane";
+
+    const container = document.querySelector(".p5") as HTMLElement;
+    const sketch = (p5: P5) => {
+        const o = {
+            size: 10,
+            distance: 20,
+            count: 5,
+            positions: [],
+            lerpedPositions: [],
+            pane: new Pane(),
+        } as any;
+
+        setupPanel();
+
+        p5.setup = () => {
+            o.width = container.clientWidth;
+            o.height = container.clientHeight;
+            o.canvas = p5.createCanvas(o.width, o.height);
+
+            p5.stroke("white");
+            p5.strokeWeight(1);
+            p5.fill("black");
+
+            // init positions
+            for (let i = 0; i < o.count; i++) {
+                o.positions.push({
+                    x: o.width / 2,
+                    y: o.height / 2,
+                });
+            }
+            o.lerpedPositions = o.positions.map((p) => ({ ...p }));
+        };
+        p5.draw = () => {
+            p5.background(0);
+            for (let i = 0; i < o.count; i++) {
+                o.lerpedPositions[i].x = lerp(
+                    o.lerpedPositions[i].x,
+                    o.positions[i].x,
+                    0.1,
+                );
+                o.lerpedPositions[i].y = lerp(
+                    o.lerpedPositions[i].y,
+                    o.positions[i].y,
+                    0.1,
+                );
+
+                if (i > 0) {
+                    p5.line(
+                        o.lerpedPositions[i - 1].x,
+                        o.lerpedPositions[i - 1].y,
+                        o.lerpedPositions[i].x,
+                        o.lerpedPositions[i].y,
+                    );
+                }
+
+                p5.ellipse(
+                    o.lerpedPositions[i].x,
+                    o.lerpedPositions[i].y,
+                    o.size,
+                );
+            }
+        };
+
+        p5.mouseMoved = () => {
+            if (!o.positions.length) return;
+            o.positions[0].x = p5.mouseX;
+            o.positions[0].y = p5.mouseY;
+            for (let i = 1; i < o.count; i++) {
+                let angle = Math.atan2(
+                    o.positions[i].x - o.positions[i - 1].x,
+                    o.positions[i].y - o.positions[i - 1].y,
+                );
+
+                o.positions[i].x =
+                    o.positions[i - 1].x + o.distance * Math.sin(angle);
+                o.positions[i].y =
+                    o.positions[i - 1].y + o.distance * Math.cos(angle);
+            }
+        };
+        p5.windowResized = () => p5.setup();
+
+        function lerp(a: number, b: number, t: number) {
+            return a + (b - a) * t;
+        }
+
+        function setupPanel() {
+            o.pane.addBinding(o, "size", { min: 1, max: 50, step: 1 });
+            o.pane.addBinding(o, "distance", { min: 1, max: 50, step: 1 });
+            o.pane.addBinding(o, "count", { min: 1, max: 50, step: 1 });
+        }
+        o.pane.on("change", () => {
+            p5.setup();
+        });
+    };
+    new P5(sketch, container);
+</script>
+<div class="p5"></div>
