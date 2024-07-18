@@ -7,7 +7,7 @@
         const o = {
             size: 10,
             distance: 20,
-            count: 5,
+            count: 10,
             positions: [],
             lerpedPositions: [],
             pane: new Pane(),
@@ -64,7 +64,7 @@
             }
         };
 
-        p5.mouseMoved = () => {
+        p5.touchMoved = p5.mouseMoved = () => {
             if (!o.positions.length) return;
             o.positions[0].x = p5.mouseX;
             o.positions[0].y = p5.mouseY;
@@ -98,3 +98,12 @@
     new P5(sketch, container);
 </script>
 <div class="p5"></div>
+<style>
+    :global(html) {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+</style>
