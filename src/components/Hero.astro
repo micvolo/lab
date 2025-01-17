@@ -1,0 +1,45 @@
+---
+import fs from "node:fs/promises";
+
+const pages = await fs.readdir("./src/pages/projects");
+const routes = pages
+    .map((p) => p.substring(0, p.lastIndexOf(".")))
+    .sort((a, b) => +a.replace(/^\D+/g, "") - +b.replace(/^\D+/g, ""))
+    .reverse();
+---
+
+<main>
+    {routes.map((a) => <a href={`/projects/${a}`}>{a}</a>)}
+</main>
+<style lang="scss">
+    main {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1rem;
+        padding: 1rem;
+        margin-bottom: 20vh;
+        @media (max-width: 64rem) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        a {
+            color: inherit;
+            text-decoration: inherit;
+            text-transform: uppercase;
+            display: grid;
+            justify-items: center;
+            align-items: center;
+            aspect-ratio: 1;
+            background-color: rgba(21, 21, 21, 0);
+            color: rgba(220, 220, 220, 0.6);
+            border-radius: 1rem;
+            font-size: clamp(2rem, 10vw, 2rem);
+            transition:
+                color 0.4s,
+                background-color 0.4s;
+            &:hover {
+                background: rgba(21, 21, 21, 1);
+                color: rgba(220, 220, 220, 1);
+            }
+        }
+    }
+</style>
